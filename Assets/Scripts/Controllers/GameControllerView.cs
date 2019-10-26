@@ -19,7 +19,7 @@ namespace Controllers {
 
 		[SerializeField] private EnemyView _enemyViewPrefab;
 
-		private Character _playerCharacter;
+		private Character _player;
 
 		private List<Character> _enemies;
 
@@ -28,10 +28,10 @@ namespace Controllers {
 		private const string ENEMY_POOL_KEY = "ENEMY_POOL_KEY";
 
 		public override void Activate() {
-			_playerCharacter = new Character();
+			_player = new Character();
 
 			_playerView.gameObject.SetActive(true);
-			_playerView.Init(_playerCharacter.ID);
+			_playerView.Init(_player.ID);
 			_playerView.SignalOnCharactersCollided.AddListener(OnCharactersCollided);
 			
 			PoolService.Instance.InitPoolWithNewObject(ENEMY_POOL_KEY, _enemyViewPrefab);
@@ -64,39 +64,45 @@ namespace Controllers {
 		}
 
 
-		private void OnCharactersCollided(CharacterView characterA, CharacterView characterB) {
-			var characterAModel = _enemies.Find(enemy => enemy.ID == characterA.ID);
-			if (characterAModel == null && _playerCharacter.ID == characterA.ID) {
-				characterAModel = _playerCharacter;
+		private void OnCharactersCollided(CharacterView firstView, CharacterView secondView) {
+			var first = _enemies.Find(enemy => enemy.ID == firstView.ID);
+			if (first == null && _player.ID == firstView.ID) {
+				first = _player;
 			}
 
-			var characterBModel = _enemies.Find(enemy => enemy.ID == characterB.ID);
-			if (characterBModel == null && _playerCharacter.ID == characterB.ID) {
-				characterBModel = _playerCharacter;
+			var second = _enemies.Find(enemy => enemy.ID == secondView.ID);
+			if (second == null && _player.ID == secondView.ID) {
+				second = _player;
 			}
 
-			if (characterAModel == null) {
-				Debug.LogError("character A model is missing!");
-			} else if (characterBModel == null) {
-				Debug.LogError("character B model is missing!");
+			if (first == null) {
+				Debug.LogError("first model is missing!");
+			} else if (second == null) {
+				Debug.LogError("second model is missing!");
 			} else {
-				if (characterAModel.Weight > characterBModel.Weight) {
-					var damage = characterBModel.Hit() * 0.5f;
-					characterB.CookiesDropped();
-					for (int i = 0; i < damage; i++) {
-						CookieSpawner.Instance.SpawnCookieByHit(characterB.transform.position);
-					}
+				if (first.Weight > second.Weight) {
+					Punch(second, secondView, firstView, false);
+				} else if (first.Weight < second.Weight) {
+					Punch(first, firstView, secondView, false);
 				} else {
-					var damage = characterAModel.Hit() * 0.5f;
-					characterA.CookiesDropped();
-					for (int i = 0; i < damage; i++) {
-						CookieSpawner.Instance.SpawnCookieByHit(characterA.transform.position);
-					}
+					Punch(first, firstView, secondView, true);
+					Punch(second, secondView, firstView, true);
 				}
-				
-				characterA.SetWeight(characterAModel.Weight);
-				characterB.SetWeight(characterBModel.Weight);
 			}
+
+			RefreshPlayerWeight(false);
+		}
+
+		private void Punch(Character characterToHit, CharacterView characterViewToHit, CharacterView characterThatHits,
+			bool isDraw) {
+			var damage = characterToHit.Hit(isDraw) * 0.5f;
+			characterViewToHit.CookiesDropped();
+			for (int i = 0; i < damage; i++) {
+				CookieSpawner.Instance.SpawnCookieByHit(characterViewToHit.transform.position);
+			}
+
+			characterViewToHit.SetWeight(characterToHit.Weight);
+			characterViewToHit.Punch(characterViewToHit.transform.position - characterThatHits.transform.position);
 		}
 
 		public override void Deactivate() {
@@ -111,7 +117,7 @@ namespace Controllers {
 			_enemyViews = null;
 
 			CookieSpawner.Instance.Clear();
-			_playerCharacter = null;
+			_player = null;
 			_enemies.Clear();
 			_enemies = null;
 
@@ -121,9 +127,9 @@ namespace Controllers {
 		}
 
 		private void RefreshPlayerWeight(bool immediately) {
-			_playerView.SetWeight(_playerCharacter.Weight);
-			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(_playerCharacter.Weight, immediately);
-			CameraView.Instance.SetTargetOrthoAccordingWithWeight(_playerCharacter.Weight);
+			_playerView.SetWeight(_player.Weight);
+			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(_player.Weight, immediately);
+			CameraView.Instance.SetTargetOrthoAccordingWithWeight(_player.Weight);
 		}
 
 		private void RefreshEnemyWeight(int id) {
@@ -177,7 +183,7 @@ namespace Controllers {
 		}
 
 		private void OnCookieEatenByPlayer(float cookieScale) {
-			_playerCharacter.EatCookie(cookieScale);
+			_player.EatCookie(cookieScale);
 			RefreshPlayerWeight(false);
 			CookieSpawner.Instance.SpawnNewCookie();
 		}
@@ -220,7 +226,7 @@ namespace Controllers {
 			}
 
 			if (Input.GetKeyDown(KeyCode.Space)) {
-				_playerCharacter.EatCookie(20);
+				_player.EatCookie(20);
 				RefreshPlayerWeight(false);
 			}
 		}

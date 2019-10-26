@@ -20,16 +20,14 @@ namespace gRaFFit.Agar.Views {
 		public Signal<CharacterView, CharacterView> SignalOnCharactersCollided;
 		private Timer _timer;
 
-		private void OnCollisionEnter2D(Collision2D other) {
-			if (other.collider.CompareTag("Player") || other.collider.CompareTag("Enemy")) {
-				var otherView = other.gameObject.GetComponent<CharacterView>();
-				otherView.Punch(otherView.transform.position - transform.position);
-				SignalOnCharactersCollided.Dispatch(otherView, this);
+		private void OnTriggerEnter2D(Collider2D other) {
+			if (other.CompareTag("Player") || other.CompareTag("Enemy")) {
+				SignalOnCharactersCollided.Dispatch(other.gameObject.GetComponent<CharacterView>(), this);
 			}
 		}
 
 		public void Punch(Vector2 punchDirection) {
-			_rigidbody2D.velocity += punchDirection * 5;
+			_rigidbody2D.velocity += punchDirection.normalized * 2f;
 		}
 		
 		public void Init(int id) {
@@ -44,7 +42,7 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public void Stop() {
-			_spriteRenderer.transform.rotation = Quaternion.identity;
+			transform.rotation = Quaternion.identity;
 			_spriteRenderer.flipY = false;
 			_rigidbody2D.velocity = Vector2.zero;
 			_rigidbody2D.angularVelocity = 0;
@@ -58,8 +56,8 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		protected void FaceToPosition(Vector3 targetPosition) {
-			_spriteRenderer.transform.rotation = Quaternion.Lerp(
-				_spriteRenderer.transform.rotation,
+			transform.rotation = Quaternion.Lerp(
+				transform.rotation,
 				RotationHelper.FaceObject(transform.position, targetPosition, 180f),
 				10f * Time.deltaTime);
 			_spriteRenderer.flipY = transform.position.x < targetPosition.x;

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
@@ -69,6 +68,8 @@ namespace gRaFFit.Agar.Views {
 
 		protected override void EnableCollider() {
 			FindNewTarget();
+			
+			base.EnableCollider();
 		}
 	}
 }

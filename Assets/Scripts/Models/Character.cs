@@ -22,11 +22,11 @@ namespace Models {
 			Weight = 0.5f;
 		}
 
-		public float Hit() {
+		public float Hit(bool isDraw) {
 			var damage = 0f;
 			
 			if (Weight > 0.5f) {
-				damage = Weight * 0.25f;
+				damage = Weight * (isDraw ? 0.1f : 0.25f);
 				Weight -= damage;
 
 				if (Weight < 0.5f) {
