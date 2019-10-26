@@ -51,7 +51,7 @@ namespace gRaFFit.Agar.Views.CameraControls {
                 new Vector3(_player.transform.position.x, _player.transform.position.y, _cachedCameraZPosition);
 
             if (InputController.Instance.IsTouch() && !EventSystem.current.IsPointerOverGameObject()) {
-                cameraTargetPosition += (Vector3) _player.GetTouchOffset() * _cameraOffsetMultiplier;
+                cameraTargetPosition += (Vector3) _player.GetTouchNormalizedOffset() * _cameraOffsetMultiplier;
             }
 
             SetCameraPosition(Vector3.Lerp(transform.position, cameraTargetPosition, _cameraSpeed * Time.deltaTime));

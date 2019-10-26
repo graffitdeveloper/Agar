@@ -1,35 +1,60 @@
+using System.Collections.Generic;
 using gRaFFit.Agar.Controllers.GameScene.MainControllers;
 using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Models.ControllerSwitcherSystem;
 using gRaFFit.Agar.Views;
 using gRaFFit.Agar.Views.CameraControls;
+using gRaFFit.Agar.Views.Pool;
 using gRaFFit.Agar.Views.UIPanelSystem;
 using Models;
 using UnityEngine;
+using Character = Models.Character;
 
 namespace Controllers {
 	public class GameControllerView : AControllerView {
-		[SerializeField] private PlayerView _player;
+		[SerializeField] private PlayerView _playerView;
 		[SerializeField] private MeshRenderer _bgMeshRenderer;
 		[SerializeField] private CookieSpawner _cookieSpawner;
+		[SerializeField] private int _targetCharactersCount;
+
+		[SerializeField] private EnemyView _enemyViewPrefab;
+		
+		private Character _playerCharacter;
+		
+		private List<Character> _enemyCharacters;
+
+		private List<EnemyView> _enemyViews = new List<EnemyView>();
+
+		private const string ENEMY_POOL_KEY = "ENEMY_POOL_KEY";
 		
 		public override void Activate() {
-			_player.gameObject.SetActive(true);
-			UIManager.Instance.ShowPanel<HudPanelView>();
+			_playerCharacter = new Character();
 			
-			PlayerModel.Instance.ResetWeight();
-			RefreshWeight(true);
+			_playerView.gameObject.SetActive(true);
+			_playerView.Init(_playerCharacter.ID);
+
+			PoolService.Instance.InitPoolWithNewObject(ENEMY_POOL_KEY, _enemyViewPrefab);
+			UIManager.Instance.ShowPanel<HudPanelView>();
+			RefreshPlayerWeight(true);
 			
 			_bgMeshRenderer.gameObject.SetActive(true);
-			CameraView.Instance.SetToPlayer(_player);
+			CameraView.Instance.SetToPlayer(_playerView);
 			_cookieSpawner.Init();
 			_cookieSpawner.InstantiateAllCookies();
+
+			for (int i = 0; i < _targetCharactersCount; i++) {
+				var newEnemy = PoolService.Instance.PopObject(ENEMY_POOL_KEY) as EnemyView;
+				if (newEnemy != null) {
+					newEnemy.transform.position = _cookieSpawner.GetRandomPositionInLevel();
+					newEnemy.FindNewTarget(_cookieSpawner.Cookies);
+				}
+			}
 			
 			AddListeners();
 		}
 
 		public override void Deactivate() {
-			_player.gameObject.SetActive(false);
+			_playerView.gameObject.SetActive(false);
 			_bgMeshRenderer.gameObject.SetActive(false);
 			_cookieSpawner.Clear();
 
@@ -38,10 +63,17 @@ namespace Controllers {
 			base.Deactivate();
 		}
 
-		private void RefreshWeight(bool immediately) {
-			_player.SetWeight(PlayerModel.Instance.Weight);
-			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(PlayerModel.Instance.Weight, immediately);
-			CameraView.Instance.SetTargetOrthoAccordingWithWeight(PlayerModel.Instance.Weight);
+		private void RefreshPlayerWeight(bool immediately) {
+			_playerView.SetWeight(_playerCharacter.Weight);
+			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(_playerCharacter.Weight, immediately);
+			CameraView.Instance.SetTargetOrthoAccordingWithWeight(_playerCharacter.Weight);
+		}
+
+		private void RefreshEnemyWeight(int id) {
+			var targetEnemy = _enemyViews.Find(enemy => enemy.ID == id);
+			if (targetEnemy != null) {
+
+			}
 		}
 
 		protected override void AddListeners() {
@@ -57,7 +89,8 @@ namespace Controllers {
 				hud.SignalOnGoToLobbyButtonClicked.AddListener(OnGoToLobbyButtonClicked);
 			}
 
-			_cookieSpawner.SignalOnCookieEaten.AddListener(OnCookieEaten);
+			_cookieSpawner.SignalOnCookieEatenByPlayer.AddListener(OnCookieEatenByPlayer);
+			_cookieSpawner.SignalOnCookieEatenByEnemy.AddListener(OnCookieEatenByEnemy);
 		}
 
 		protected override void RemoveListeners() {
@@ -71,7 +104,8 @@ namespace Controllers {
 				hud.SignalOnGoToLobbyButtonClicked.RemoveListener(OnGoToLobbyButtonClicked);
 			}
 
-			_cookieSpawner.SignalOnCookieEaten.RemoveListener(OnCookieEaten);
+			_cookieSpawner.SignalOnCookieEatenByPlayer.RemoveListener(OnCookieEatenByPlayer);
+			_cookieSpawner.SignalOnCookieEatenByEnemy.RemoveListener(OnCookieEatenByEnemy);
 
 			base.RemoveListeners();
 		}
@@ -84,30 +118,50 @@ namespace Controllers {
 			ControllerSwitcher.Instance.SwitchController(ControllerType.Game);
 		}
 
-		private void OnCookieEaten(float cookieScale) {
-			PlayerModel.Instance.EatCookie(cookieScale);
-			RefreshWeight(false);
+		private void OnCookieEatenByPlayer(float cookieScale) {
+			_playerCharacter.EatCookie(cookieScale);
+			RefreshPlayerWeight(false);
 			
 			_cookieSpawner.SpawnNewCookie();
 		}
 
+		private void OnCookieEatenByEnemy(float cookieWeight, int enemyID) {
+			var targetEnemy = _enemyCharacters.Find(enemy => enemy.ID == enemyID);
+			if (targetEnemy != null) {
+				targetEnemy.EatCookie(cookieWeight);
+				RefreshEnemyWeight(enemyID);
+				
+				_cookieSpawner.SpawnNewCookie();
+			} else {
+				Debug.LogError($"target enemy model with {enemyID} is missing, wtf");
+			}
+		}
+
 		private void OnTouchStart(Vector2 obj) {
-			_player.PlayWalkAnimation();
+			_playerView.PlayWalkAnimation();
 		}
 
 		private void OnTouchEnd(Vector2 obj) {
-			_player.Stop();
+			_playerView.Stop();
 		}
 
 		private void OnTouch(Vector2 obj) {
-			_player.FaceToTouch();
-			_player.MoveByControls();
+			_playerView.FaceToTouch();
+			_playerView.MoveByControls();
 
-			_bgMeshRenderer.material.mainTextureOffset = _player.GetOffset();
+			_bgMeshRenderer.material.mainTextureOffset = _playerView.GetOffsetForBG();
 			_bgMeshRenderer.transform.position = new Vector3(
-				_player.transform.position.x,
-				_player.transform.position.y,
+				_playerView.transform.position.x,
+				_playerView.transform.position.y,
 				_bgMeshRenderer.transform.position.z);
+		}
+
+		private List<EnemyView> Enemies = new List<EnemyView>();
+
+		private void Update() {
+			for (int i = 0; i < Enemies.Count; i++) {
+				Enemies[i].MoveToTarget();
+			}
 		}
 
 		public override ControllerType Type => ControllerType.Game;

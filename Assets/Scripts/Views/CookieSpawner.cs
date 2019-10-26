@@ -13,9 +13,14 @@ namespace gRaFFit.Agar.Views {
 		[SerializeField] private float _minCookieScale;
 		[SerializeField] private float _maxCookieScale;
 		
+		
+		
 		private List<CookieView> _currentCookiesInstances;
-		public Signal<float> SignalOnCookieEaten = new Signal<float>();
+		public Signal<float> SignalOnCookieEatenByPlayer = new Signal<float>();
+		public Signal<float, EnemyView> SignalOnCookieEatenByEnemy = new Signal<float, EnemyView>();
 
+		public List<CookieView> Cookies => _currentCookiesInstances;
+		
 		public const string COOKIE_POOL_ID = "COOKIE_POOL_ID";
 
 		public void Init() {
@@ -31,22 +36,31 @@ namespace gRaFFit.Agar.Views {
 			}
 		}
 
+		public Vector3 GetRandomPositionInLevel() {
+			return new Vector3(
+				Random.Range(_spawnMinPoint.position.x, _spawnMaxPoint.position.x),
+				Random.Range(_spawnMinPoint.position.y, _spawnMaxPoint.position.y));
+		}
+
 		public void SpawnNewCookie() {
 			var newCookie = PoolService.Instance.PopObject(COOKIE_POOL_ID, transform) as CookieView;
 			if (newCookie != null) {
 				_currentCookiesInstances.Add(newCookie);
-				newCookie.transform.position = new Vector3(
-					Random.Range(_spawnMinPoint.position.x, _spawnMaxPoint.position.x),
-					Random.Range(_spawnMinPoint.position.y, _spawnMaxPoint.position.y));
+				newCookie.transform.position = GetRandomPositionInLevel();
 				newCookie.SetScale(Random.Range(_minCookieScale, _maxCookieScale));
-				newCookie.SignalOnCookieEaten.AddListener(OnCookieEaten);
+				newCookie.SignalOnCookieEatenByPlayer.AddListener(OnCookieEatenByPlayer);
+				newCookie.SignalOnCookieEatenByEnemy.AddListener(OnCookieEatenByEnemy);
 			} else {
 				Debug.LogError("ERROR SPAWNING COOKIE");
 			}
 		}
 
-		private void OnCookieEaten(float cookieScale) {
-			SignalOnCookieEaten.Dispatch(cookieScale);
+		private void OnCookieEatenByEnemy(float cookieScale, EnemyView enemy) {
+			SignalOnCookieEatenByEnemy.Dispatch(cookieScale, enemy);
+		}
+
+		private void OnCookieEatenByPlayer(float cookieScale) {
+			SignalOnCookieEatenByPlayer.Dispatch(cookieScale);
 		}
 
 		public void Clear() {

@@ -4,13 +4,17 @@ using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
 	public class CookieView : GameObjectPoolable {
-		public Signal<float> SignalOnCookieEaten = new Signal<float>();
+		public Signal<float> SignalOnCookieEatenByPlayer = new Signal<float>();
+		public Signal<float, EnemyView> SignalOnCookieEatenByEnemy = new Signal<float, EnemyView>();
 
 		private float _cookieScale;
-		
+
 		private void OnTriggerEnter2D(Collider2D other) {
 			if (other.CompareTag("Player")) {
-				SignalOnCookieEaten.Dispatch(_cookieScale);
+				SignalOnCookieEatenByPlayer.Dispatch(_cookieScale);
+				Dispose();
+			} else if (other.CompareTag("Enemy")) {
+				SignalOnCookieEatenByEnemy.Dispatch(_cookieScale, other.GetComponent<EnemyView>());
 				Dispose();
 			}
 		}
@@ -18,16 +22,16 @@ namespace gRaFFit.Agar.Views {
 		public override void Instantiate() {
 			base.Instantiate();
 			SetScale(1f);
-			
-			SignalOnCookieEaten = new Signal<float>();
+
+			SignalOnCookieEatenByPlayer = new Signal<float>();
 		}
 
 		public override void Dispose() {
 			base.Dispose();
 
-			if (SignalOnCookieEaten != null) {
-				SignalOnCookieEaten.RemoveAllListeners();
-				SignalOnCookieEaten = null;
+			if (SignalOnCookieEatenByPlayer != null) {
+				SignalOnCookieEatenByPlayer.RemoveAllListeners();
+				SignalOnCookieEatenByPlayer = null;
 			}
 		}
 
