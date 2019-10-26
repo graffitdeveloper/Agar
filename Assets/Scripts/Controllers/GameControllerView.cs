@@ -18,48 +18,73 @@ namespace Controllers {
 		[SerializeField] private int _targetCharactersCount;
 
 		[SerializeField] private EnemyView _enemyViewPrefab;
-		
-		private Character _playerCharacter;
-		
-		private List<Character> _enemyCharacters;
 
-		private List<EnemyView> _enemyViews = new List<EnemyView>();
+		private Character _playerCharacter;
+
+		private List<Character> _enemies;
+
+		private List<EnemyView> _enemyViews;
 
 		private const string ENEMY_POOL_KEY = "ENEMY_POOL_KEY";
-		
+
 		public override void Activate() {
 			_playerCharacter = new Character();
-			
+
 			_playerView.gameObject.SetActive(true);
 			_playerView.Init(_playerCharacter.ID);
 
 			PoolService.Instance.InitPoolWithNewObject(ENEMY_POOL_KEY, _enemyViewPrefab);
 			UIManager.Instance.ShowPanel<HudPanelView>();
 			RefreshPlayerWeight(true);
-			
+
 			_bgMeshRenderer.gameObject.SetActive(true);
 			CameraView.Instance.SetToPlayer(_playerView);
 			_cookieSpawner.Init();
 			_cookieSpawner.InstantiateAllCookies();
+			_enemies = new List<Character>();
+			_enemyViews = new List<EnemyView>();
 
 			for (int i = 0; i < _targetCharactersCount; i++) {
+				var enemyModel = new Character();
+				_enemies.Add(enemyModel);
+
 				var newEnemy = PoolService.Instance.PopObject(ENEMY_POOL_KEY) as EnemyView;
 				if (newEnemy != null) {
+					_enemyViews.Add(newEnemy);
+					newEnemy.Init(enemyModel.ID);
 					newEnemy.transform.position = _cookieSpawner.GetRandomPositionInLevel();
 					newEnemy.FindNewTarget(_cookieSpawner.Cookies);
 				}
 			}
-			
+
 			AddListeners();
 		}
 
+
+		public void RefreshTargets() {
+			for (int i = 0; i < _enemyViews.Count; i++) {
+				_enemyViews[i].FindNewTarget(_cookieSpawner.Cookies);
+			}
+		}
+		
 		public override void Deactivate() {
 			_playerView.gameObject.SetActive(false);
 			_bgMeshRenderer.gameObject.SetActive(false);
+
+			for (int i = 0; i < _enemyViews.Count; i++) {
+				_enemyViews[i].Dispose();
+			}
+
+			_enemyViews.Clear();
+			_enemyViews = null;
+
 			_cookieSpawner.Clear();
+			_playerCharacter = null;
+			_enemies.Clear();
+			_enemies = null;
 
 			UIManager.Instance.HidePanel<HudPanelView>();
-			
+
 			base.Deactivate();
 		}
 
@@ -70,9 +95,10 @@ namespace Controllers {
 		}
 
 		private void RefreshEnemyWeight(int id) {
-			var targetEnemy = _enemyViews.Find(enemy => enemy.ID == id);
-			if (targetEnemy != null) {
-
+			var enemyModel = _enemies.Find(enemy => enemy.ID == id);
+			var enemyView = _enemyViews.Find(enemy => enemy.ID == id);
+			if (enemyView != null) {
+				enemyView.SetWeight(enemyModel.Weight);
 			}
 		}
 
@@ -115,22 +141,24 @@ namespace Controllers {
 		}
 
 		private void OnRestartButtonClicked() {
-			ControllerSwitcher.Instance.SwitchController(ControllerType.Game);
+			ControllerSwitcher.Instance.RestartCurrentController();
 		}
 
 		private void OnCookieEatenByPlayer(float cookieScale) {
 			_playerCharacter.EatCookie(cookieScale);
 			RefreshPlayerWeight(false);
 			
+			RefreshTargets();
 			_cookieSpawner.SpawnNewCookie();
 		}
 
 		private void OnCookieEatenByEnemy(float cookieWeight, int enemyID) {
-			var targetEnemy = _enemyCharacters.Find(enemy => enemy.ID == enemyID);
+			var targetEnemy = _enemies.Find(enemy => enemy.ID == enemyID);
 			if (targetEnemy != null) {
 				targetEnemy.EatCookie(cookieWeight);
 				RefreshEnemyWeight(enemyID);
-				
+
+				RefreshTargets();
 				_cookieSpawner.SpawnNewCookie();
 			} else {
 				Debug.LogError($"target enemy model with {enemyID} is missing, wtf");
@@ -156,11 +184,11 @@ namespace Controllers {
 				_bgMeshRenderer.transform.position.z);
 		}
 
-		private List<EnemyView> Enemies = new List<EnemyView>();
-
 		private void Update() {
-			for (int i = 0; i < Enemies.Count; i++) {
-				Enemies[i].MoveToTarget();
+			if (_enemyViews != null) {
+				for (int i = 0; i < _enemyViews.Count; i++) {
+					_enemyViews[i].MoveToTarget();
+				}
 			}
 		}
 

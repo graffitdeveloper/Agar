@@ -51,11 +51,11 @@ public class HudPanelView : UIPanelView {
 
 	private float _targetWeight;
 	private float _displayingWeight;
-	
-	public void RefreshWeight(float weight, bool immediately) {
-		_targetWeight = weight;
+
+	public void RefreshWeight(float newWeight, bool immediately) {
+		_targetWeight = newWeight;
 		if (immediately) {
-			_displayingWeight = weight;
+			_displayingWeight = newWeight;
 			_yourWeightText.text = _displayingWeight.ToString();
 		}
 	}

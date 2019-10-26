@@ -61,6 +61,12 @@ namespace gRaFFit.Agar.Models.ControllerSwitcherSystem {
 			GetCurrentController().Activate();
 		}
 
+		public void RestartCurrentController() {
+			var currentController = GetCurrentController();
+			currentController.Deactivate();
+			currentController.Activate();
+		}
+
 		#endregion
 
 		#region Private Methods

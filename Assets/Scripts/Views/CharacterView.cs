@@ -29,6 +29,7 @@ namespace gRaFFit.Agar.Views {
 			_spriteRenderer.transform.rotation = Quaternion.identity;
 			_spriteRenderer.flipY = false;
 			_rigidbody2D.velocity = Vector2.zero;
+			_rigidbody2D.angularVelocity = 0;
 
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_SIT);
 		}
@@ -46,6 +47,12 @@ namespace gRaFFit.Agar.Views {
 					Screen.height * 0.5f)) + CameraView.Instance.GetCameraOffset();
 
 			_spriteRenderer.flipY = playerPosition.x < targetPosition.x;
+		}
+
+		public override void Dispose() {
+			Stop();
+
+			base.Dispose();
 		}
 	}
 }

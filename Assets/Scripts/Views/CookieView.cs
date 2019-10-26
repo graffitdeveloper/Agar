@@ -4,18 +4,20 @@ using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
 	public class CookieView : GameObjectPoolable {
-		public Signal<float> SignalOnCookieEatenByPlayer = new Signal<float>();
-		public Signal<float, EnemyView> SignalOnCookieEatenByEnemy = new Signal<float, EnemyView>();
+		public Signal<CookieView> SignalOnCookieEatenByPlayer;
+		public Signal<CookieView, int> SignalOnCookieEatenByEnemy;
 
-		private float _cookieScale;
+		public float CookieScale { get; private set; }
 
 		private void OnTriggerEnter2D(Collider2D other) {
 			if (other.CompareTag("Player")) {
-				SignalOnCookieEatenByPlayer.Dispatch(_cookieScale);
-				Dispose();
+				if (SignalOnCookieEatenByPlayer != null) {
+					SignalOnCookieEatenByPlayer.Dispatch(this);
+				}
 			} else if (other.CompareTag("Enemy")) {
-				SignalOnCookieEatenByEnemy.Dispatch(_cookieScale, other.GetComponent<EnemyView>());
-				Dispose();
+				if (SignalOnCookieEatenByEnemy != null) {
+					SignalOnCookieEatenByEnemy.Dispatch(this, other.GetComponent<EnemyView>().ID);
+				}
 			}
 		}
 
@@ -23,7 +25,8 @@ namespace gRaFFit.Agar.Views {
 			base.Instantiate();
 			SetScale(1f);
 
-			SignalOnCookieEatenByPlayer = new Signal<float>();
+			SignalOnCookieEatenByPlayer = new Signal<CookieView>();
+			SignalOnCookieEatenByEnemy = new Signal<CookieView, int>();
 		}
 
 		public override void Dispose() {
@@ -33,11 +36,16 @@ namespace gRaFFit.Agar.Views {
 				SignalOnCookieEatenByPlayer.RemoveAllListeners();
 				SignalOnCookieEatenByPlayer = null;
 			}
+
+			if (SignalOnCookieEatenByEnemy != null) {
+				SignalOnCookieEatenByEnemy.RemoveAllListeners();
+				SignalOnCookieEatenByEnemy = null;
+			}
 		}
 
 		public void SetScale(float scale) {
-			_cookieScale = scale;
-			transform.localScale = new Vector3(_cookieScale, _cookieScale, _cookieScale);
+			CookieScale = scale;
+			transform.localScale = new Vector3(CookieScale, CookieScale, CookieScale);
 		}
 	}
 }
