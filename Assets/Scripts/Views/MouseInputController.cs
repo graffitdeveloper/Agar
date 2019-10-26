@@ -12,12 +12,16 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
         /// </summary>
         protected override void CheckInput() {
             if (Input.GetMouseButtonDown(0)) {
-                HandleTouchDown(Input.mousePosition);
+                HandleTouchStart(Input.mousePosition);
             } else if (Input.GetMouseButton(0)) {
                 HandleTouch(Input.mousePosition);
             } else if (Input.GetMouseButtonUp(0)) {
                 HandleTouchEnd(Input.mousePosition);
             }
+        }
+
+        public override Vector2 GetTouchPosition() {
+            return Input.mousePosition;
         }
 
         #endregion

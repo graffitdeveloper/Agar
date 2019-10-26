@@ -21,7 +21,7 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
 
                     switch (currTouch.phase) {
                         case TouchPhase.Began:
-                            HandleTouchDown(currTouch.position);
+                            HandleTouchStart(currTouch.position);
                             exitLoop = true;
                             break;
                         case TouchPhase.Moved:
@@ -40,6 +40,10 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
                         return;
                 }
             }
+        }
+
+        public override Vector2 GetTouchPosition() {
+            return Input.touches[0].position;
         }
 
         #endregion

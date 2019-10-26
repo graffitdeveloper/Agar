@@ -195,9 +195,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraSpeed: 1.5
-  _cameraDirectionOffset: 3
-  _cameraOrthoChangeSpeed: 1
-  _cameraWalkOrthoValue: 3
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -319,6 +316,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _spriteRenderer: {fileID: 1701287196}
+  _animator: {fileID: 737353820}
 --- !u!224 &865756497 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7854510329126543379, guid: d71722f5d3d26674594140f4fb476d91,

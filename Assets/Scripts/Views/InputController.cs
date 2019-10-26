@@ -1,4 +1,3 @@
-using gRaFFit.Agar.Utils;
 using gRaFFit.Agar.Utils.Signals;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -54,7 +53,7 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
 
         #region Signals
 
-        public Signal<Vector2> SignalOnTouchDown = new Signal<Vector2>();
+        public Signal<Vector2> SignalOnTouchStart = new Signal<Vector2>();
 
         public Signal<Vector2> SignalOnTouch = new Signal<Vector2>();
 
@@ -78,6 +77,8 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
         /// </summary>
         protected abstract void CheckInput();
 
+        public abstract Vector2 GetTouchPosition();
+        
         #endregion
 
         #region Public Methods
@@ -86,8 +87,8 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
 
         #region Private Methods
 
-        protected void HandleTouchDown(Vector3 inputPosition) {
-            SignalOnTouchDown.Dispatch(inputPosition);
+        protected void HandleTouchStart(Vector3 inputPosition) {
+            SignalOnTouchStart.Dispatch(inputPosition);
         }
 
         protected void HandleTouch(Vector3 inputPosition) {
