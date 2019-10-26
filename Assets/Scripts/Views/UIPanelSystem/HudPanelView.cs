@@ -2,7 +2,6 @@
 using gRaFFit.Agar.Utils.Signals;
 using gRaFFit.Agar.Views.UIPanelSystem;
 using UnityEngine;
-using UnityEngine.Experimental.PlayerLoop;
 using UnityEngine.UI;
 
 public class HudPanelView : UIPanelView {

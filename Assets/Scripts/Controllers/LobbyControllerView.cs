@@ -9,17 +9,35 @@ namespace Controllers {
 
 
 		public override void Activate() {
-			var mainPanel = UIManager.Instance.ShowPanel<MainPanelView>();
-			mainPanel.SignalOnPlayButtonClicked.AddListener(OnPlayButtonClicked);
+			UIManager.Instance.ShowPanel<MainPanelView>();
+			
+			AddListeners();
 		}
 
 		public override void Deactivate() {
-			var mainPanel = UIManager.Instance.GetPanel<MainPanelView>();
-			mainPanel.SignalOnPlayButtonClicked.RemoveListener(OnPlayButtonClicked);
-			mainPanel.Hide();
+			UIManager.Instance.HidePanel<MainPanelView>();
 
 			base.Deactivate();
 		}
+		
+		protected override void AddListeners() {
+			base.AddListeners();
+
+			var mainPanel = UIManager.Instance.GetPanel<MainPanelView>();
+			if (mainPanel != null) {
+				mainPanel.SignalOnPlayButtonClicked.AddListener(OnPlayButtonClicked);
+			}
+		}
+		
+		protected override void RemoveListeners() {
+			var mainPanel = UIManager.Instance.GetPanel<MainPanelView>();
+			if (mainPanel != null && mainPanel.IsSignalsInited) {
+				mainPanel.SignalOnPlayButtonClicked.RemoveListener(OnPlayButtonClicked);
+			}
+
+			base.RemoveListeners();
+		}
+
 
 		private void OnPlayButtonClicked() {
 			ControllerSwitcher.Instance.SwitchController(ControllerType.Game);

@@ -1,5 +1,6 @@
 ﻿using gRaFFit.Agar.Controllers.InputSystem;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace gRaFFit.Agar.Views.CameraControls {
     /// <summary>
@@ -44,7 +45,7 @@ namespace gRaFFit.Agar.Views.CameraControls {
             var cameraTargetPosition =
                 new Vector3(_player.transform.position.x, _player.transform.position.y, _cachedCameraZPosition);
 
-            if (InputController.Instance.IsTouch()) {
+            if (InputController.Instance.IsTouch() && !EventSystem.current.IsPointerOverGameObject()) {
                 cameraTargetPosition += (Vector3) _player.GetTouchOffset() * _cameraOffsetMultiplier;
             }
 

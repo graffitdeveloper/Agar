@@ -28,17 +28,19 @@ namespace Controllers {
 			AddListeners();
 		}
 
-		private void RefreshWeight(bool immediately) {
-			_player.SetWeight(PlayerModel.Instance.Weight);
-			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(PlayerModel.Instance.Weight, immediately);
-		}
-
 		public override void Deactivate() {
 			_player.gameObject.SetActive(false);
 			_bgMeshRenderer.gameObject.SetActive(false);
 			_cookieSpawner.Clear();
+
+			UIManager.Instance.HidePanel<HudPanelView>();
 			
 			base.Deactivate();
+		}
+
+		private void RefreshWeight(bool immediately) {
+			_player.SetWeight(PlayerModel.Instance.Weight);
+			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(PlayerModel.Instance.Weight, immediately);
 		}
 
 		protected override void AddListeners() {
@@ -47,6 +49,13 @@ namespace Controllers {
 			InputController.Instance.SignalOnTouchStart.AddListener(OnTouchStart);
 			InputController.Instance.SignalOnTouchEnd.AddListener(OnTouchEnd);
 			InputController.Instance.SignalOnTouch.AddListener(OnTouch);
+
+			var hud = UIManager.Instance.GetPanel<HudPanelView>();
+			if (hud != null) {
+				hud.SignalOnRestartButtonClicked.AddListener(OnRestartButtonClicked);
+				hud.SignalOnGoToLobbyButtonClicked.AddListener(OnGoToLobbyButtonClicked);
+			}
+
 			_cookieSpawner.SignalOnCookieEaten.AddListener(OnCookieEaten);
 		}
 
@@ -54,9 +63,24 @@ namespace Controllers {
 			InputController.Instance.SignalOnTouchStart.RemoveListener(OnTouchStart);
 			InputController.Instance.SignalOnTouchEnd.RemoveListener(OnTouchEnd);
 			InputController.Instance.SignalOnTouch.RemoveListener(OnTouch);
+
+			var hud = UIManager.Instance.GetPanel<HudPanelView>();
+			if (hud != null && hud.IsSignalsInited) {
+				hud.SignalOnRestartButtonClicked.RemoveListener(OnRestartButtonClicked);
+				hud.SignalOnGoToLobbyButtonClicked.RemoveListener(OnGoToLobbyButtonClicked);
+			}
+
 			_cookieSpawner.SignalOnCookieEaten.RemoveListener(OnCookieEaten);
-			
+
 			base.RemoveListeners();
+		}
+
+		private void OnGoToLobbyButtonClicked() {
+			ControllerSwitcher.Instance.SwitchController(ControllerType.Lobby);
+		}
+
+		private void OnRestartButtonClicked() {
+			ControllerSwitcher.Instance.SwitchController(ControllerType.Game);
 		}
 
 		private void OnCookieEaten(float cookieScale) {

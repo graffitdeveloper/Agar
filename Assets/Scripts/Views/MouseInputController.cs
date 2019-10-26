@@ -23,7 +23,7 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
         public override Vector2 GetTouchPosition() {
             return Input.mousePosition;
         }
-        
+
         public override bool IsTouchDown() {
             return Input.GetMouseButtonDown(0);
         }
