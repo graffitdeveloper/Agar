@@ -17,6 +17,17 @@ namespace gRaFFit.Agar.Views {
 			InputController.Instance.SignalOnTouch.AddListener(OnTouch);
 		}
 
+		private void OnTouchStart(Vector2 obj) {
+			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_WALK);
+		}
+
+		private void OnTouchEnd(Vector2 obj) {
+			_spriteRenderer.transform.rotation = Quaternion.identity;
+			_spriteRenderer.flipY = false;
+
+			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_SIT);
+		}
+
 		private void OnTouch(Vector2 obj) {
 			var touchPosition =
 				CachedMainCamera.Instance.Camera.ScreenToWorldPoint(InputController.Instance.GetTouchPosition());
@@ -27,18 +38,6 @@ namespace gRaFFit.Agar.Views {
 				                     Screen.height * 0.5f)) + CameraView.Instance.GetCameraOffset();
 
 			_spriteRenderer.flipY = playerPosition.x < touchPosition.x;
-		}
-
-		private void OnTouchEnd(Vector2 obj) {
-			_spriteRenderer.transform.rotation = Quaternion.identity;
-			_spriteRenderer.flipY = false;
-
-
-			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_SIT);
-		}
-
-		private void OnTouchStart(Vector2 obj) {
-			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_WALK);
 		}
 	}
 }
