@@ -12,13 +12,15 @@ namespace gRaFFit.Agar.Views {
 		[SerializeField] private Animator _animator;
 		[SerializeField] private Rigidbody2D _rigidbody2D;
 		[SerializeField] private float _moveSpeed;
-		
+		[SerializeField] private float _weightScaleCost;
+		[SerializeField] private Vector3 _minimumSize;
+
 		public void PlayWalkAnimation() {
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_WALK);
 		}
 
 		private Vector3 _startPosition;
-		
+
 		public void Awake() {
 			_startPosition = transform.position;
 		}
@@ -53,6 +55,10 @@ namespace gRaFFit.Agar.Views {
 
 		public void MoveByControls() {
 			_rigidbody2D.velocity = GetTouchOffset() * _moveSpeed;
+		}
+
+		public void SetWeight(float newWeight) {
+			transform.localScale = _minimumSize + (_weightScaleCost * newWeight * Vector3.one);
 		}
 	}
 }

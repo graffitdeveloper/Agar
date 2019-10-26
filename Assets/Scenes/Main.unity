@@ -422,7 +422,7 @@ GameObject:
   - component: {fileID: 737353823}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -479,6 +479,8 @@ MonoBehaviour:
   _animator: {fileID: 1257218115}
   _rigidbody2D: {fileID: 737353820}
   _moveSpeed: 2
+  _weightScaleCost: 0.01
+  _minimumSize: {x: 0.5, y: 0.5, z: 0.5}
 --- !u!61 &737353823
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -492,7 +494,7 @@ BoxCollider2D:
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.072063774, y: 0.0048042536}
+  m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -924,7 +926,9 @@ MonoBehaviour:
   _spawnMaxPoint: {fileID: 579504646}
   _cookiePrefab: {fileID: 8875428486434832925, guid: aa8addc693fde59409dbc25a70af4b8e,
     type: 3}
-  _targetCookiesCount: 100
+  _targetCookiesCount: 1000
+  _minCookieScale: 0.1
+  _maxCookieScale: 1.5
 --- !u!4 &2079623020
 Transform:
   m_ObjectHideFlags: 0

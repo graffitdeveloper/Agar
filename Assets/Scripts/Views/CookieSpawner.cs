@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using gRaFFit.Agar.Utils.Signals;
 using gRaFFit.Agar.Views.Pool;
 using UnityEngine;
 
@@ -9,7 +10,11 @@ namespace gRaFFit.Agar.Views {
 		[SerializeField] private CookieView _cookiePrefab;
 		[SerializeField] private int _targetCookiesCount;
 
+		[SerializeField] private float _minCookieScale;
+		[SerializeField] private float _maxCookieScale;
+		
 		private List<CookieView> _currentCookiesInstances;
+		public Signal<float> SignalOnCookieEaten = new Signal<float>();
 
 		public const string COOKIE_POOL_ID = "COOKIE_POOL_ID";
 
@@ -33,9 +38,15 @@ namespace gRaFFit.Agar.Views {
 				newCookie.transform.position = new Vector3(
 					Random.Range(_spawnMinPoint.position.x, _spawnMaxPoint.position.x),
 					Random.Range(_spawnMinPoint.position.y, _spawnMaxPoint.position.y));
+				newCookie.SetScale(Random.Range(_minCookieScale, _maxCookieScale));
+				newCookie.SignalOnCookieEaten.AddListener(OnCookieEaten);
 			} else {
 				Debug.LogError("ERROR SPAWNING COOKIE");
 			}
+		}
+
+		private void OnCookieEaten(float cookieScale) {
+			SignalOnCookieEaten.Dispatch(cookieScale);
 		}
 
 		public void Clear() {

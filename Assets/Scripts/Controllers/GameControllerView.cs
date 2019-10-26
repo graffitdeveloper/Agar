@@ -1,9 +1,9 @@
-using System.Net;
 using gRaFFit.Agar.Controllers.GameScene.MainControllers;
 using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Models.ControllerSwitcherSystem;
 using gRaFFit.Agar.Views;
 using gRaFFit.Agar.Views.CameraControls;
+using Models;
 using UnityEngine;
 
 namespace Controllers {
@@ -14,8 +14,10 @@ namespace Controllers {
 		
 		public override void Activate() {
 			_player.gameObject.SetActive(true);
-			_bgMeshRenderer.gameObject.SetActive(true);
+			PlayerModel.Instance.ResetWeight();
+			_player.SetWeight(PlayerModel.Instance.Weight);
 
+			_bgMeshRenderer.gameObject.SetActive(true);
 			CameraView.Instance.SetToPlayer(_player);
 			_cookieSpawner.Init();
 			_cookieSpawner.InstantiateAllCookies();
@@ -37,14 +39,23 @@ namespace Controllers {
 			InputController.Instance.SignalOnTouchStart.AddListener(OnTouchStart);
 			InputController.Instance.SignalOnTouchEnd.AddListener(OnTouchEnd);
 			InputController.Instance.SignalOnTouch.AddListener(OnTouch);
+			_cookieSpawner.SignalOnCookieEaten.AddListener(OnCookieEaten);
 		}
 
 		protected override void RemoveListeners() {
 			InputController.Instance.SignalOnTouchStart.RemoveListener(OnTouchStart);
 			InputController.Instance.SignalOnTouchEnd.RemoveListener(OnTouchEnd);
 			InputController.Instance.SignalOnTouch.RemoveListener(OnTouch);
-
+			_cookieSpawner.SignalOnCookieEaten.RemoveListener(OnCookieEaten);
+			
 			base.RemoveListeners();
+		}
+
+		private void OnCookieEaten(float cookieScale) {
+			PlayerModel.Instance.EatCookie(cookieScale);
+			_player.SetWeight(PlayerModel.Instance.Weight);
+			
+			_cookieSpawner.SpawnNewCookie();
 		}
 
 		private void OnTouchStart(Vector2 obj) {
