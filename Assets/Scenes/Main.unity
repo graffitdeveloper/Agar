@@ -397,7 +397,7 @@ MonoBehaviour:
   _playerView: {fileID: 737353822}
   _bgMeshRenderer: {fileID: 466409487}
   _cookieSpawner: {fileID: 2079623019}
-  _targetCharactersCount: 5
+  _targetCharactersCount: 15
   _enemyViewPrefab: {fileID: 7356482565248512310, guid: 894a7f3b800e97649804f2ee290d8bb8,
     type: 3}
 --- !u!4 &653634914
