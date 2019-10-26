@@ -55,5 +55,11 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
             return _playerTransform.position - transform.position;
         }
+
+
+        public void SetToPlayer(Transform playerTransform) {
+            _playerTransform = playerTransform;
+            transform.position = playerTransform.position;
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Utils;
 using gRaFFit.Agar.Views.CameraControls;
@@ -10,14 +11,23 @@ namespace gRaFFit.Agar.Views {
 
 		[SerializeField] private SpriteRenderer _spriteRenderer;
 		[SerializeField] private Animator _animator;
-
+		[SerializeField] private Rigidbody2D _rigidbody2D;
+		[SerializeField] private float _moveSpeed;
+		
 		public void PlayWalkAnimation() {
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_WALK);
+		}
+
+		private Vector3 _startPosition;
+		
+		public void Awake() {
+			_startPosition = transform.position;
 		}
 
 		public void Stop() {
 			_spriteRenderer.transform.rotation = Quaternion.identity;
 			_spriteRenderer.flipY = false;
+			_rigidbody2D.velocity = Vector2.zero;
 
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_SIT);
 		}
@@ -32,6 +42,16 @@ namespace gRaFFit.Agar.Views {
 					Screen.height * 0.5f)) + CameraView.Instance.GetCameraOffset();
 
 			_spriteRenderer.flipY = playerPosition.x < touchPosition.x;
+		}
+
+		public Vector2 GetOffset() {
+			return _startPosition - transform.position;
+		}
+
+		public void MoveByControls() {
+			_rigidbody2D.velocity =
+				((Vector3) InputController.Instance.GetTouchWorldPosition() - transform.position).normalized *
+				_moveSpeed;
 		}
 	}
 }
