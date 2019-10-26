@@ -3,6 +3,7 @@ using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Models.ControllerSwitcherSystem;
 using gRaFFit.Agar.Views;
 using gRaFFit.Agar.Views.CameraControls;
+using gRaFFit.Agar.Views.UIPanelSystem;
 using Models;
 using UnityEngine;
 
@@ -14,15 +15,22 @@ namespace Controllers {
 		
 		public override void Activate() {
 			_player.gameObject.SetActive(true);
+			UIManager.Instance.ShowPanel<HudPanelView>();
+			
 			PlayerModel.Instance.ResetWeight();
-			_player.SetWeight(PlayerModel.Instance.Weight);
-
+			RefreshWeight(true);
+			
 			_bgMeshRenderer.gameObject.SetActive(true);
 			CameraView.Instance.SetToPlayer(_player);
 			_cookieSpawner.Init();
 			_cookieSpawner.InstantiateAllCookies();
 			
 			AddListeners();
+		}
+
+		private void RefreshWeight(bool immediately) {
+			_player.SetWeight(PlayerModel.Instance.Weight);
+			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(PlayerModel.Instance.Weight, immediately);
 		}
 
 		public override void Deactivate() {
@@ -53,7 +61,7 @@ namespace Controllers {
 
 		private void OnCookieEaten(float cookieScale) {
 			PlayerModel.Instance.EatCookie(cookieScale);
-			_player.SetWeight(PlayerModel.Instance.Weight);
+			RefreshWeight(false);
 			
 			_cookieSpawner.SpawnNewCookie();
 		}
