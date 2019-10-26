@@ -47,10 +47,8 @@ namespace gRaFFit.Agar.Views {
 			return _startPosition - transform.position;
 		}
 
-		public Vector3 GetTouchOffset() {
-			var res = (InputController.Instance.GetTouchWorldPosition() - (Vector2)transform.position).normalized;
-			Debug.Log($"<color=cyan>{res.x}  {res.y}</color>");
-			return res;
+		public Vector2 GetTouchOffset() {
+			return (InputController.Instance.GetTouchWorldPosition() - (Vector2) transform.position).normalized;
 		}
 
 		public void MoveByControls() {

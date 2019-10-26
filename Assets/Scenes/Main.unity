@@ -917,11 +917,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: MainPanelView
       objectReference: {fileID: 0}
-    - target: {fileID: 7854510329126543378, guid: d71722f5d3d26674594140f4fb476d91,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 7854510329126543379, guid: d71722f5d3d26674594140f4fb476d91,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -1026,11 +1021,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 7854510329298400873, guid: d71722f5d3d26674594140f4fb476d91,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 168.40039
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d71722f5d3d26674594140f4fb476d91, type: 3}
