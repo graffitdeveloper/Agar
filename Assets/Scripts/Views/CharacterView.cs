@@ -22,10 +22,16 @@ namespace gRaFFit.Agar.Views {
 
 		private void OnCollisionEnter2D(Collision2D other) {
 			if (other.collider.CompareTag("Player") || other.collider.CompareTag("Enemy")) {
-				SignalOnCharactersCollided.Dispatch(other.gameObject.GetComponent<CharacterView>(), this);
+				var otherView = other.gameObject.GetComponent<CharacterView>();
+				otherView.Punch(otherView.transform.position - transform.position);
+				SignalOnCharactersCollided.Dispatch(otherView, this);
 			}
 		}
 
+		public void Punch(Vector2 punchDirection) {
+			_rigidbody2D.velocity += punchDirection * 5;
+		}
+		
 		public void Init(int id) {
 			ID = id;
 			SignalOnCharactersCollided = new Signal<CharacterView, CharacterView>();
@@ -76,10 +82,11 @@ namespace gRaFFit.Agar.Views {
 
 		public void CookiesDropped() {
 			_collider2D.enabled = false;
-			_timer = TimerManager.Instance.SetTimeout(2f, EnableCollider);
+			_timer = TimerManager.Instance.SetTimeout(1f, EnableCollider);
 		}
 
-		private void EnableCollider() {
+		protected virtual void EnableCollider() {
+			_rigidbody2D.angularVelocity = 0;
 			_collider2D.enabled = true;
 		}
 	}

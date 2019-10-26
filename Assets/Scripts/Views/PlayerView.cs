@@ -23,7 +23,11 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public void MoveByControls() {
-			_rigidbody2D.velocity = GetTouchNormalizedOffset() * _moveSpeed;
+			if (_collider2D.enabled) {
+				_rigidbody2D.velocity = GetTouchNormalizedOffset() * _moveSpeed;
+			} else {
+				_rigidbody2D.velocity = Vector3.Lerp(_rigidbody2D.velocity, Vector3.zero, 1f * Time.deltaTime);
+			}
 		}
 	}
 }

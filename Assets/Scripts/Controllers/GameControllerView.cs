@@ -218,6 +218,11 @@ namespace Controllers {
 					_enemyViews[i].MoveToTarget();
 				}
 			}
+
+			if (Input.GetKeyDown(KeyCode.Space)) {
+				_playerCharacter.EatCookie(20);
+				RefreshPlayerWeight(false);
+			}
 		}
 
 		public override ControllerType Type => ControllerType.Game;
