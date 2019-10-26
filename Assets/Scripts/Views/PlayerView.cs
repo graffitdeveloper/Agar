@@ -1,4 +1,3 @@
-using System;
 using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Utils;
 using gRaFFit.Agar.Views.CameraControls;
@@ -44,14 +43,16 @@ namespace gRaFFit.Agar.Views {
 			_spriteRenderer.flipY = playerPosition.x < touchPosition.x;
 		}
 
-		public Vector2 GetOffset() {
+		public Vector3 GetOffset() {
 			return _startPosition - transform.position;
 		}
 
+		public Vector3 GetTouchOffset() {
+			return ((Vector3) InputController.Instance.GetTouchWorldPosition() - transform.position).normalized;
+		}
+
 		public void MoveByControls() {
-			_rigidbody2D.velocity =
-				((Vector3) InputController.Instance.GetTouchWorldPosition() - transform.position).normalized *
-				_moveSpeed;
+			_rigidbody2D.velocity = GetTouchOffset() * _moveSpeed;
 		}
 	}
 }

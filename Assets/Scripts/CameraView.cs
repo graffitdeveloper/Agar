@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using gRaFFit.Agar.Controllers.InputSystem;
+using UnityEngine;
 
 namespace gRaFFit.Agar.Views.CameraControls {
     /// <summary>
@@ -29,18 +30,23 @@ namespace gRaFFit.Agar.Views.CameraControls {
 #pragma warning disable 649
 
         [SerializeField] private float _cameraSpeed;
-
+        [SerializeField] private float _cameraOffsetMultiplier;
+        
 #pragma warning restore 649
 
-        private Transform _playerTransform;
+        private PlayerView _player;
 
         private float _cachedCameraZPosition;
 
         public void Update() {
-            if (_playerTransform == null) return;
+            if (_player == null) return;
 
-            var cameraTargetPosition = new Vector3(_playerTransform.position.x, _playerTransform.position.y,
-                _cachedCameraZPosition);
+            var cameraTargetPosition =
+                new Vector3(_player.transform.position.x, _player.transform.position.y, _cachedCameraZPosition);
+
+            if (InputController.Instance.IsTouch()) {
+                cameraTargetPosition += _player.GetTouchOffset() * _cameraOffsetMultiplier;
+            }
 
             transform.position = Vector3.Lerp(transform.position, cameraTargetPosition, _cameraSpeed * Time.deltaTime);
         }
@@ -50,16 +56,16 @@ namespace gRaFFit.Agar.Views.CameraControls {
         /// достичь игрока
         /// </summary>
         public Vector3 GetCameraOffset() {
-            if (_playerTransform == null)
+            if (_player == null)
                 return Vector3.zero;
 
-            return _playerTransform.position - transform.position;
+            return _player.transform.position - transform.position;
         }
 
 
-        public void SetToPlayer(Transform playerTransform) {
-            _playerTransform = playerTransform;
-            transform.position = playerTransform.position;
+        public void SetToPlayer(PlayerView playerTransform) {
+            _player = playerTransform;
+            transform.position = _player.transform.position;
         }
     }
 }

@@ -1,4 +1,3 @@
-using gRaFFit.Agar.Utils;
 using UnityEngine;
 
 namespace gRaFFit.Agar.Controllers.InputSystem {
@@ -23,6 +22,18 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
 
         public override Vector2 GetTouchPosition() {
             return Input.mousePosition;
+        }
+        
+        public override bool IsTouchDown() {
+            return Input.GetMouseButtonDown(0);
+        }
+
+        public override bool IsTouch() {
+            return Input.GetMouseButton(0);
+        }
+
+        public override bool IsTouchUp() {
+            return Input.GetMouseButtonUp(0);
         }
 
         #endregion

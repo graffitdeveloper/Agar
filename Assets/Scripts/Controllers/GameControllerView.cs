@@ -14,7 +14,7 @@ namespace Controllers {
 			_player.gameObject.SetActive(true);
 			_bgMeshRenderer.gameObject.SetActive(true);
 
-			CameraView.Instance.SetToPlayer(_player.transform);
+			CameraView.Instance.SetToPlayer(_player);
 
 			AddListeners();
 		}

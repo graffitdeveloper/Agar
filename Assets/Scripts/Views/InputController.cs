@@ -77,7 +77,9 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
         /// Проверка ввода
         /// </summary>
         protected abstract void CheckInput();
-
+        public abstract bool IsTouchDown();
+        public abstract bool IsTouch();
+        public abstract bool IsTouchUp();
         
         #endregion
 

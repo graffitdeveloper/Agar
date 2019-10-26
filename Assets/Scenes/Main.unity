@@ -275,6 +275,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _cameraSpeed: 1.5
+  _cameraOffsetMultiplier: 10
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
