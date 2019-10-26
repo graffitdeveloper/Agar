@@ -5,7 +5,8 @@ using gRaFFit.Agar.Utils.Signals;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace gRaFFit.Agar.Views.UI.Panels {
+namespace gRaFFit.Agar.Views.UIPanelSystem {
+    
     /// <summary>
     /// Абстрактный класс панели
     /// </summary>
