@@ -5,6 +5,32 @@ using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
 	public class CookieSpawner : MonoBehaviour {
+		#region MonoSingleton
+
+		private CookieSpawner() {
+		}
+
+		private void Awake() {
+			if (Instance != null && Instance != this) {
+				Debug.LogError($"Multiple instances of {GetType()} on scene found, fix this!!!");
+				Destroy(Instance);
+			}
+		}
+
+		public static CookieSpawner Instance {
+			get {
+				if (_instance == null) {
+					_instance = FindObjectOfType<CookieSpawner>();
+				}
+
+				return _instance;
+			}
+		}
+
+		private static CookieSpawner _instance;
+
+		#endregion
+		
 		[SerializeField] private Transform _spawnMinPoint;
 		[SerializeField] private Transform _spawnMaxPoint;
 		[SerializeField] private CookieView _cookiePrefab;
@@ -43,13 +69,29 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public void SpawnNewCookie() {
+			if (_currentCookiesInstances.Count < _targetCookiesCount) {
+				var newCookie = PoolService.Instance.PopObject(COOKIE_POOL_ID, transform) as CookieView;
+				if (newCookie != null) {
+					newCookie.transform.position = GetRandomPositionInLevel();
+					newCookie.SetScale(Random.Range(_minCookieScale, _maxCookieScale));
+					newCookie.SignalOnCookieEatenByPlayer.AddListener(OnCookieEatenByPlayer);
+					newCookie.SignalOnCookieEatenByEnemy.AddListener(OnCookieEatenByEnemy);
+					_currentCookiesInstances.Add(newCookie);
+				} else {
+					Debug.LogError("ERROR SPAWNING COOKIE");
+				}
+			}
+		}
+
+		public void SpawnCookieByHit(Vector3 targetPosition) {
 			var newCookie = PoolService.Instance.PopObject(COOKIE_POOL_ID, transform) as CookieView;
 			if (newCookie != null) {
-				newCookie.transform.position = GetRandomPositionInLevel();
+				newCookie.transform.position = targetPosition;
 				newCookie.SetScale(Random.Range(_minCookieScale, _maxCookieScale));
 				newCookie.SignalOnCookieEatenByPlayer.AddListener(OnCookieEatenByPlayer);
 				newCookie.SignalOnCookieEatenByEnemy.AddListener(OnCookieEatenByEnemy);
 				_currentCookiesInstances.Add(newCookie);
+				newCookie.Punch();
 			} else {
 				Debug.LogError("ERROR SPAWNING COOKIE");
 			}
