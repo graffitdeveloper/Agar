@@ -32,12 +32,17 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
         [SerializeField] private float _cameraSpeed;
         [SerializeField] private float _cameraOffsetMultiplier;
+        [SerializeField] private Camera _camera;
+        [SerializeField] private float _basicOrtho;
+        [SerializeField] private float _weightOrthoCost;
         
 #pragma warning restore 649
 
         private PlayerView _player;
 
         private float _cachedCameraZPosition;
+
+        private float _targetOrtho;
 
         public void Update() {
             if (_player == null) return;
@@ -50,6 +55,7 @@ namespace gRaFFit.Agar.Views.CameraControls {
             }
 
             SetCameraPosition(Vector3.Lerp(transform.position, cameraTargetPosition, _cameraSpeed * Time.deltaTime));
+            _camera.orthographicSize = Mathf.Lerp(_camera.orthographicSize, _targetOrtho, Time.deltaTime);
         }
 
         /// <summary>
@@ -71,6 +77,10 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
         public void SetCameraPosition(Vector3 position) {
             transform.position = new Vector3(position.x, position.y, _cachedCameraZPosition);
+        }
+
+        public void SetTargetOrthoAccordingWithWeight(float weight) {
+            _targetOrtho = _basicOrtho + weight * _weightOrthoCost;
         }
     }
 }

@@ -41,6 +41,7 @@ namespace Controllers {
 		private void RefreshWeight(bool immediately) {
 			_player.SetWeight(PlayerModel.Instance.Weight);
 			UIManager.Instance.GetPanel<HudPanelView>().RefreshWeight(PlayerModel.Instance.Weight, immediately);
+			CameraView.Instance.SetTargetOrthoAccordingWithWeight(PlayerModel.Instance.Weight);
 		}
 
 		protected override void AddListeners() {

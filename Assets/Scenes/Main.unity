@@ -276,6 +276,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _cameraSpeed: 1
   _cameraOffsetMultiplier: 3
+  _camera: {fileID: 519420031}
+  _basicOrtho: 2.14
+  _weightOrthoCost: 0.1
 --- !u!20 &519420031
 Camera:
   m_ObjectHideFlags: 0
@@ -1156,6 +1159,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Pivot.y
       value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6512284045084378124, guid: cbfe42be9bcb40d43a8d2cf3a4a21d5a,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 21.386719
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: cbfe42be9bcb40d43a8d2cf3a4a21d5a, type: 3}
