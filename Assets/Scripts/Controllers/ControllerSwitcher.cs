@@ -40,7 +40,7 @@ namespace gRaFFit.Agar.Models.ControllerSwitcherSystem {
 		/// <summary>
 		/// Список контроллеров
 		/// </summary>
-		private List<AControllerView> _controllers = new List<AControllerView>();
+		[SerializeField] private List<AControllerView> _controllers = new List<AControllerView>();
 
 		#endregion
 
