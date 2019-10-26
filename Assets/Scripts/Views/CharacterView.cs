@@ -52,7 +52,10 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		protected void FaceToPosition(Vector3 targetPosition) {
-			_spriteRenderer.transform.rotation = RotationHelper.FaceObject(transform.position, targetPosition, 180f);
+			_spriteRenderer.transform.rotation = Quaternion.Lerp(
+				_spriteRenderer.transform.rotation,
+				RotationHelper.FaceObject(transform.position, targetPosition, 180f),
+				10f * Time.deltaTime);
 			_spriteRenderer.flipY = transform.position.x < targetPosition.x;
 		}
 
