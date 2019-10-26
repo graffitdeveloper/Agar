@@ -10,7 +10,8 @@ namespace gRaFFit.Agar.Views {
 
 		[SerializeField] private SpriteRenderer _spriteRenderer;
 		[SerializeField] private Animator _animator;
-
+		[SerializeField] private Transform _root;
+		
 		public void Start() {
 			InputController.Instance.SignalOnTouchStart.AddListener(OnTouchStart);
 			InputController.Instance.SignalOnTouchEnd.AddListener(OnTouchEnd);
@@ -34,8 +35,9 @@ namespace gRaFFit.Agar.Views {
 
 			_spriteRenderer.transform.rotation = RotationHelper.FaceObject(transform.position, touchPosition, 180f);
 
-			var playerPosition = CachedMainCamera.Instance.Camera.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f,
-				                     Screen.height * 0.5f)) + CameraView.Instance.GetCameraOffset();
+			var playerPosition =
+				CachedMainCamera.Instance.Camera.ScreenToWorldPoint(new Vector3(Screen.width * 0.5f,
+					Screen.height * 0.5f)) + CameraView.Instance.GetCameraOffset();
 
 			_spriteRenderer.flipY = playerPosition.x < touchPosition.x;
 		}
