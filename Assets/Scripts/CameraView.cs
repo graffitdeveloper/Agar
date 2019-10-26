@@ -48,7 +48,7 @@ namespace gRaFFit.Agar.Views.CameraControls {
                 cameraTargetPosition += (Vector3) _player.GetTouchOffset() * _cameraOffsetMultiplier;
             }
 
-            transform.position = Vector3.Lerp(transform.position, cameraTargetPosition, _cameraSpeed * Time.deltaTime);
+            SetCameraPosition(Vector3.Lerp(transform.position, cameraTargetPosition, _cameraSpeed * Time.deltaTime));
         }
 
         /// <summary>
@@ -65,7 +65,11 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
         public void SetToPlayer(PlayerView playerTransform) {
             _player = playerTransform;
-            transform.position = _player.transform.position;
+            SetCameraPosition(_player.transform.position);
+        }
+
+        public void SetCameraPosition(Vector3 position) {
+            transform.position = new Vector3(position.x, position.y, _cachedCameraZPosition);
         }
     }
 }

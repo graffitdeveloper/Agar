@@ -1,3 +1,4 @@
+using System.Net;
 using gRaFFit.Agar.Controllers.GameScene.MainControllers;
 using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Models.ControllerSwitcherSystem;
@@ -9,20 +10,24 @@ namespace Controllers {
 	public class GameControllerView : AControllerView {
 		[SerializeField] private PlayerView _player;
 		[SerializeField] private MeshRenderer _bgMeshRenderer;
-
+		[SerializeField] private CookieSpawner _cookieSpawner;
+		
 		public override void Activate() {
 			_player.gameObject.SetActive(true);
 			_bgMeshRenderer.gameObject.SetActive(true);
 
 			CameraView.Instance.SetToPlayer(_player);
-
+			_cookieSpawner.Init();
+			_cookieSpawner.InstantiateAllCookies();
+			
 			AddListeners();
 		}
 
 		public override void Deactivate() {
 			_player.gameObject.SetActive(false);
 			_bgMeshRenderer.gameObject.SetActive(false);
-
+			_cookieSpawner.Clear();
+			
 			base.Deactivate();
 		}
 
