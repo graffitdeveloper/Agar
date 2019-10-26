@@ -1,3 +1,4 @@
+using gRaFFit.Agar.Utils;
 using gRaFFit.Agar.Utils.Signals;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -77,12 +78,17 @@ namespace gRaFFit.Agar.Controllers.InputSystem {
         /// </summary>
         protected abstract void CheckInput();
 
-        public abstract Vector2 GetTouchPosition();
         
         #endregion
 
         #region Public Methods
+        
+        public abstract Vector2 GetTouchPosition();
 
+        public Vector2 GetTouchWorldPosition() {
+            return CachedMainCamera.Instance.Camera.ScreenToWorldPoint(GetTouchPosition());
+        }
+        
         #endregion
 
         #region Private Methods

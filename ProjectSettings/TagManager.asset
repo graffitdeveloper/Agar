@@ -13,8 +13,8 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
+  - BG
+  - Cat
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Cat
+    uniqueID: 3845096145
+    locked: 0
+  - name: BG
+    uniqueID: 1188888213
     locked: 0

@@ -10,28 +10,20 @@ namespace gRaFFit.Agar.Views {
 
 		[SerializeField] private SpriteRenderer _spriteRenderer;
 		[SerializeField] private Animator _animator;
-		[SerializeField] private Transform _root;
-		
-		public void Start() {
-			InputController.Instance.SignalOnTouchStart.AddListener(OnTouchStart);
-			InputController.Instance.SignalOnTouchEnd.AddListener(OnTouchEnd);
-			InputController.Instance.SignalOnTouch.AddListener(OnTouch);
-		}
 
-		private void OnTouchStart(Vector2 obj) {
+		public void PlayWalkAnimation() {
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_WALK);
 		}
 
-		private void OnTouchEnd(Vector2 obj) {
+		public void Stop() {
 			_spriteRenderer.transform.rotation = Quaternion.identity;
 			_spriteRenderer.flipY = false;
 
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_CAT_SIT);
 		}
 
-		private void OnTouch(Vector2 obj) {
-			var touchPosition =
-				CachedMainCamera.Instance.Camera.ScreenToWorldPoint(InputController.Instance.GetTouchPosition());
+		public void FaceToTouch() {
+			var touchPosition = InputController.Instance.GetTouchWorldPosition();
 
 			_spriteRenderer.transform.rotation = RotationHelper.FaceObject(transform.position, touchPosition, 180f);
 
