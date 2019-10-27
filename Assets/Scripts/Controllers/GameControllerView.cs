@@ -12,13 +12,17 @@ namespace Controllers {
 	public class GameControllerView : AControllerView {
 		[SerializeField] private MeshRenderer _bgMeshRenderer;
 		[SerializeField] private int _targetCharactersCount;
-
 		[SerializeField] private EnemyView _enemyViewPrefab;
+		[SerializeField] private PlayerView _playerView;
+		[SerializeField] private GameObject _hurtEffect;
 
 		private Character _player;
-		[SerializeField] private PlayerView _playerView;
-
+		private Vector3 _playerStartPosition;
 		private const string ENEMY_POOL_KEY = "ENEMY_POOL_KEY";
+
+		public void Awake() {
+			_playerStartPosition = _playerView.transform.position;
+		}
 
 		public override void Activate() {
 			PoolService.Instance.InitPoolWithNewObject(ENEMY_POOL_KEY, _enemyViewPrefab);
@@ -54,6 +58,7 @@ namespace Controllers {
 			_playerView.gameObject.SetActive(true);
 			CharactersContainer.Instance.PutCharacter(_player, _playerView);
 			RefreshCharacterWeight(_player.ID, true);
+			_playerView.transform.position = _playerStartPosition;
 		}
 
 		private void OnCharactersCollided(CharacterView firstView, CharacterView secondView) {
@@ -84,9 +89,22 @@ namespace Controllers {
 				CookieSpawner.Instance.SpawnCookieByHit(characterViewToHit.transform.position);
 			}
 
+			if (characterViewToHit is PlayerView) {
+				CameraView.Instance.DoCollide(Random.Range(15f, 25f));
+				ShowHurtEffect();
+			}
+			else if (characterThatHits is PlayerView) {
+				CameraView.Instance.DoCollide(Random.Range(5f, 10f));
+			}
+			
 			characterViewToHit.SetWeight(characterToHit.Weight);
 			characterViewToHit.Punch(characterViewToHit.transform.position - characterThatHits.transform.position);
 			RefreshCharacterWeight(characterToHit.ID, false);
+		}
+
+		private void ShowHurtEffect() {
+			_hurtEffect.gameObject.SetActive(false);
+			_hurtEffect.gameObject.SetActive(true);
 		}
 
 		public override void Deactivate() {

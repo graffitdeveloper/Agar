@@ -4,7 +4,8 @@ using UnityEngine;
 namespace gRaFFit.Agar.Views {
 
 	public class EnemyView : CharacterView {
-
+		[SerializeField] private float _attackDistance;
+		
 		private CookieView _targetCookie;
 		private CharacterView _targetCharacter;
 
@@ -28,14 +29,18 @@ namespace gRaFFit.Agar.Views {
 			}
 		}
 
-		private CharacterView FindNearestCharacter() {
-			CharacterView nearestCharacter = null;
+		private bool FindNearestCharacter() {
+			CharacterView nearestCharacterView = null;
 			float distanceToNearestCharacter = 0;
+
+			var isFound = false;
 
 			for (int i = 0; i < CharactersContainer.Instance.CharacterViews.Count; i++) {
 				var currentCharacter = CharactersContainer.Instance.CharacterViews[i];
-				if (nearestCharacter == null) {
-					nearestCharacter = currentCharacter;
+				if (currentCharacter.ID == ID) continue;
+
+				if (nearestCharacterView == null) {
+					nearestCharacterView = currentCharacter;
 					distanceToNearestCharacter =
 						Vector2.Distance(currentCharacter.transform.position, transform.position);
 				} else {
@@ -43,15 +48,34 @@ namespace gRaFFit.Agar.Views {
 						Vector2.Distance(currentCharacter.transform.position, transform.position);
 					if (distanceToCurrentCharacter < distanceToNearestCharacter) {
 						distanceToNearestCharacter = distanceToCurrentCharacter;
-						nearestCharacter = currentCharacter;
+						nearestCharacterView = currentCharacter;
 					}
 				}
 			}
 
-			return nearestCharacter;
+			if (nearestCharacterView != null && !nearestCharacterView.IsStunned) {
+				var nearestCharacter = CharactersContainer.Instance.GetCharacter(nearestCharacterView.ID);
+				var meCharacterView = CharactersContainer.Instance.GetCharacterView(ID);
+				var meCharacter = CharactersContainer.Instance.GetCharacter(ID);
+
+				if (nearestCharacterView != null && nearestCharacter != null &&
+				    meCharacterView != null && meCharacter != null) {
+					var distance = Vector2.Distance(nearestCharacterView.transform.position, transform.position);
+					if (distance < _attackDistance) {
+						if (nearestCharacter.Weight < meCharacter.Weight) {
+							isFound = true;
+							_targetCharacter = nearestCharacterView;
+							_targetCharacter.SignalOnCharactersCollided.AddListener(OnMyTargetCharacterCollided);
+							PlayWalkAnimation();
+						}
+					}
+				}
+			}
+
+			return isFound;
 		}
 
-		private CookieView FindNearestCookie() {
+		private void FindNearestCookie() {
 			CookieView foundCookie = null;
 			float distanceToNearestCookie = 0;
 
@@ -74,14 +98,13 @@ namespace gRaFFit.Agar.Views {
 			}
 
 			if (foundCookie != null) {
+				_targetCookie = foundCookie;
 				PlayWalkAnimation();
 				foundCookie.SignalOnCookieEatenByCharacter.AddListener(OnMyCookieEaten);
 			} else {
 				Stop();
 				Debug.LogError("Can't find cookies :(");
 			}
-
-			return foundCookie;
 		}
 
 
@@ -90,34 +113,30 @@ namespace gRaFFit.Agar.Views {
 				if (_targetCookie.SignalOnCookieEatenByCharacter != null) {
 					_targetCookie.SignalOnCookieEatenByCharacter.RemoveListener(OnMyCookieEaten);
 				}
+
+				_targetCookie = null;
+			}
+			if (_targetCharacter != null) {
+				if (_targetCharacter.SignalOnCharactersCollided != null) {
+					_targetCharacter.SignalOnCharactersCollided.RemoveListener(OnMyTargetCharacterCollided);
+				}
+
+				_targetCharacter = null;
 			}
 
-			/*
-			var nearestCharacterView = FindNearestCharacter();
-			var nearestCharacter = CharactersContainer.Instance.GetCharacter(nearestCharacterView.ID);
-			var meCharacterView = CharactersContainer.Instance.GetCharacterView(ID);
-			var meCharacter = CharactersContainer.Instance.GetCharacter(ID);
-
-			if (nearestCharacterView != null && nearestCharacter != null &&
-			    meCharacterView != null && meCharacter != null) {
-				var distance = Vector2.Distance(nearestCharacterView.transform.position, transform.position);
-				if (distance < 5f) {
-
-					if (nearestCharacter.Weight < meCharacter.Weight) {
-						_targetCharacter = nearestCharacterView;
-						PlayWalkAnimation();
-					}
-				}
-			} else {
-			*/
-				_targetCookie = FindNearestCookie();
-			//}
+			if (!FindNearestCharacter()) {
+				FindNearestCookie();
+			}
 		}
 
 		private void OnMyCookieEaten(CookieView cookie, int enemyID) {
 			FindNewTarget();
 		}
 
+		private void OnMyTargetCharacterCollided(CharacterView arg1, CharacterView arg2) {
+			FindNewTarget();
+		}
+		
 		protected override void EnableCollider() {
 			FindNewTarget();
 			

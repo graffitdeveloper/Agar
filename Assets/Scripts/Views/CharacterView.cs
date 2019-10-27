@@ -27,7 +27,7 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public void Punch(Vector2 punchDirection) {
-			_rigidbody2D.velocity += punchDirection.normalized * 2f;
+			_rigidbody2D.velocity += punchDirection.normalized * 3f;
 		}
 		
 		public void Init(int id) {
@@ -36,6 +36,7 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public int ID { get; set; }
+		public bool IsStunned { get; set; }
 
 		public void PlayWalkAnimation() {
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_WALK);
@@ -65,7 +66,8 @@ namespace gRaFFit.Agar.Views {
 
 		public override void Dispose() {
 			Stop();
-			
+			IsStunned = false;
+
 			if (SignalOnCharactersCollided != null) {
 				SignalOnCharactersCollided.RemoveAllListeners();
 				SignalOnCharactersCollided = null;
@@ -79,11 +81,15 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public void CookiesDropped() {
+			IsStunned = true;
+			
 			_collider2D.enabled = false;
 			_timer = TimerManager.Instance.SetTimeout(1f, EnableCollider);
 		}
 
 		protected virtual void EnableCollider() {
+			IsStunned = false;
+			
 			_rigidbody2D.angularVelocity = 0;
 			_collider2D.enabled = true;
 		}

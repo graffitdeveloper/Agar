@@ -35,7 +35,7 @@ namespace gRaFFit.Agar.Views.CameraControls {
         [SerializeField] private Camera _camera;
         [SerializeField] private float _basicOrtho;
         [SerializeField] private float _weightOrthoCost;
-        
+
 #pragma warning restore 649
 
         private PlayerView _player;
@@ -56,17 +56,8 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
             SetCameraPosition(Vector3.Lerp(transform.position, cameraTargetPosition, _cameraSpeed * Time.deltaTime));
             _camera.orthographicSize = Mathf.Lerp(_camera.orthographicSize, _targetOrtho, Time.deltaTime);
-        }
 
-        /// <summary>
-        /// Возвращает сдвиг камеры относительно кота; векторное расстояние, которое должна пройти камера что бы
-        /// достичь игрока
-        /// </summary>
-        public Vector3 GetCameraOffset() {
-            if (_player == null)
-                return Vector3.zero;
-
-            return _player.transform.position - transform.position;
+            CollideCamera();
         }
 
 
@@ -75,12 +66,47 @@ namespace gRaFFit.Agar.Views.CameraControls {
             SetCameraPosition(_player.transform.position);
         }
 
-        public void SetCameraPosition(Vector3 position) {
+        private void SetCameraPosition(Vector3 position) {
             transform.position = new Vector3(position.x, position.y, _cachedCameraZPosition);
         }
 
         public void SetTargetOrthoAccordingWithWeight(float weight) {
             _targetOrtho = _basicOrtho + weight * _weightOrthoCost;
+        }
+
+
+        private float _currentCollideRotate;
+
+        [SerializeField] private float _cameraCollideRotateSpeed;
+
+        [SerializeField] private float _afterCollideCameraFixSpeed;
+        
+        [SerializeField] private float _collideCameraRotateMultiplier;
+
+        /// <summary>
+        /// Эффект удара камеры с её выворачиванием по оси Z
+        /// </summary>
+        private void CollideCamera() {
+            transform.rotation = Quaternion.Lerp(transform.rotation,
+                Quaternion.Euler(0, 0, _currentCollideRotate), _cameraCollideRotateSpeed);
+
+            _currentCollideRotate = Mathf.Lerp(_currentCollideRotate, 0, _afterCollideCameraFixSpeed);
+        }
+
+
+        /// <summary>
+        /// Отклик на столкновение игрока с препятствием
+        /// </summary>
+        /// <param name="collideForce">Сила столкновения</param>
+        public void DoCollide(float collideForce) {
+            collideForce *= _collideCameraRotateMultiplier;
+
+            if (Mathf.Abs(_currentCollideRotate) >= collideForce * 0.5f)
+                return;
+
+            _currentCollideRotate = Random.Range(0, 100) < 50
+                ? collideForce
+                : -collideForce;
         }
     }
 }

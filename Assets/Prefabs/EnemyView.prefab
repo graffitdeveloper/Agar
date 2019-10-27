@@ -183,6 +183,7 @@ MonoBehaviour:
   _moveSpeed: 2
   _weightScaleCost: 0.01
   _minimumSize: {x: 0.5, y: 0.5, z: 0.5}
+  _attackDistance: 2
 --- !u!50 &3281024762627589434
 Rigidbody2D:
   serializedVersion: 4
