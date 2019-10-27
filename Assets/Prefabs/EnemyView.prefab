@@ -180,7 +180,7 @@ MonoBehaviour:
   _animator: {fileID: 21044357954399501}
   _rigidbody2D: {fileID: 3281024762627589434}
   _collider2D: {fileID: 7276254923849946366}
-  _moveSpeed: 2
+  _moveSpeed: 3
   _weightScaleCost: 0.01
   _minimumSize: {x: 0.5, y: 0.5, z: 0.5}
   _attackDistance: 2

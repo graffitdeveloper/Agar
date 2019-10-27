@@ -1,4 +1,5 @@
 using Controllers;
+using Models;
 using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
@@ -11,16 +12,27 @@ namespace gRaFFit.Agar.Views {
 
 		public override void MoveToTarget() {
 			if (_collider2D.enabled) {
+				var model = CharactersContainer.Instance.GetCharacter(ID);
+
+				var normalizedWeight = model.Weight / Character.MaxWeight;
+
+				var antiWeight = (1f - normalizedWeight);
+				if (antiWeight <= 0.25f) {
+					antiWeight = 0.25f;
+				}
+
 				if (_targetCharacter != null) {
 					_rigidbody2D.velocity =
-						((Vector2) _targetCharacter.transform.position - (Vector2) transform.position).normalized *
-						_moveSpeed;
+						antiWeight *
+						_moveSpeed * ((Vector2) _targetCharacter.transform.position - (Vector2) transform.position)
+						.normalized;
 
 					FaceToPosition(_targetCharacter.transform.position);
 				} else if (_targetCookie != null) {
 					_rigidbody2D.velocity =
-						((Vector2) _targetCookie.transform.position - (Vector2) transform.position).normalized *
-						_moveSpeed;
+						antiWeight *
+						_moveSpeed * ((Vector2) _targetCookie.transform.position - (Vector2) transform.position)
+						.normalized;
 
 					FaceToPosition(_targetCookie.transform.position);
 				} else {

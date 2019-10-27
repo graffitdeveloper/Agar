@@ -10,11 +10,12 @@ namespace Models {
 
 		public int ID { get; private set; }
 		public float Weight { get; private set; }
+		public const float MaxWeight = 450;
 
 		public void EatCookie(float eatenCookieScale) {
 			Weight += eatenCookieScale;
-			if (Weight > 450) {
-				Weight = 450;
+			if (Weight > MaxWeight) {
+				Weight = MaxWeight;
 			}
 		}
 

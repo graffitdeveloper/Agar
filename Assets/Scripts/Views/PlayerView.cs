@@ -1,4 +1,6 @@
+using Controllers;
 using gRaFFit.Agar.Controllers.InputSystem;
+using Models;
 using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
@@ -15,7 +17,7 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public Vector3 GetOffsetForBG() {
-			return _startPosition - transform.position;
+			return (_startPosition - transform.position) * 2;
 		}
 
 		public Vector2 GetTouchNormalizedOffset() {
@@ -23,8 +25,16 @@ namespace gRaFFit.Agar.Views {
 		}
 
 		public void MoveByControls() {
+			var model = CharactersContainer.Instance.GetCharacter(ID);
+			var normalizedWeight = model.Weight / Character.MaxWeight;
+
+			var antiWeight = (1f - normalizedWeight);
+			if (antiWeight <= 0.25f) {
+				antiWeight = 0.25f;
+			}
+
 			if (_collider2D.enabled) {
-				_rigidbody2D.velocity = GetTouchNormalizedOffset() * _moveSpeed;
+				_rigidbody2D.velocity = antiWeight * _moveSpeed * GetTouchNormalizedOffset();
 			} else {
 				_rigidbody2D.velocity = Vector3.Lerp(_rigidbody2D.velocity, Vector3.zero, 1f * Time.deltaTime);
 			}
