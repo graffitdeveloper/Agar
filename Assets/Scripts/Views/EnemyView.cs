@@ -17,8 +17,8 @@ namespace gRaFFit.Agar.Views {
 				var normalizedWeight = model.Weight / Character.MaxWeight;
 
 				var antiWeight = (1f - normalizedWeight);
-				if (antiWeight <= 0.25f) {
-					antiWeight = 0.25f;
+				if (antiWeight <= 0.5f) {
+					antiWeight = 0.5f;
 				}
 
 				if (_targetCharacter != null) {
