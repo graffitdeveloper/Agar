@@ -75,6 +75,7 @@ namespace gRaFFit.Agar.Models.ControllerSwitcherSystem {
 		/// Вызывается при старте работы контроллера
 		/// </summary>
 		private void Start() {
+			Input.multiTouchEnabled = false;
 			SwitchController(ControllerType.Lobby);
 		}
 
