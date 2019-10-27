@@ -9,30 +9,49 @@ namespace gRaFFit.Agar.Views {
 		private CharacterView _targetCharacter;
 
 		public override void MoveToTarget() {
-			if (_targetCookie != null && _collider2D.enabled) {
-				_rigidbody2D.velocity =
-					((Vector2) _targetCookie.transform.position - (Vector2) transform.position).normalized *
-					_moveSpeed;
+			if (_collider2D.enabled) {
+				if (_targetCharacter != null) {
+					_rigidbody2D.velocity =
+						((Vector2) _targetCharacter.transform.position - (Vector2) transform.position).normalized *
+						_moveSpeed;
 
-				FaceToPosition(_targetCookie.transform.position);
-			} else {
-				_rigidbody2D.velocity = Vector3.Lerp(_rigidbody2D.velocity, Vector3.zero, 1f * Time.deltaTime);
+					FaceToPosition(_targetCharacter.transform.position);
+				} else if (_targetCookie != null) {
+					_rigidbody2D.velocity =
+						((Vector2) _targetCookie.transform.position - (Vector2) transform.position).normalized *
+						_moveSpeed;
+
+					FaceToPosition(_targetCookie.transform.position);
+				} else {
+					_rigidbody2D.velocity = Vector3.Lerp(_rigidbody2D.velocity, Vector3.zero, 1f * Time.deltaTime);
+				}
 			}
 		}
 
-		public void FindNewTarget() {
-			if (_targetCookie != null) {
-				if (_targetCookie.SignalOnCookieEatenByCharacter != null) {
-					_targetCookie.SignalOnCookieEatenByCharacter.RemoveListener(OnMyCookieEaten);
+		private CharacterView FindNearestCharacter() {
+			CharacterView nearestCharacter = null;
+			float distanceToNearestCharacter = 0;
+
+			for (int i = 0; i < CharactersContainer.Instance.CharacterViews.Count; i++) {
+				var currentCharacter = CharactersContainer.Instance.CharacterViews[i];
+				if (nearestCharacter == null) {
+					nearestCharacter = currentCharacter;
+					distanceToNearestCharacter =
+						Vector2.Distance(currentCharacter.transform.position, transform.position);
+				} else {
+					var distanceToCurrentCharacter =
+						Vector2.Distance(currentCharacter.transform.position, transform.position);
+					if (distanceToCurrentCharacter < distanceToNearestCharacter) {
+						distanceToNearestCharacter = distanceToCurrentCharacter;
+						nearestCharacter = currentCharacter;
+					}
 				}
 			}
 
+			return nearestCharacter;
+		}
 
-			for (int i = 0; i < CharactersContainer.Instance.Characters.Count; i++) {
-				// TODO: 
-			}
-			
-
+		private CookieView FindNearestCookie() {
 			CookieView foundCookie = null;
 			float distanceToNearestCookie = 0;
 
@@ -55,13 +74,44 @@ namespace gRaFFit.Agar.Views {
 			}
 
 			if (foundCookie != null) {
-				_targetCookie = foundCookie;
 				PlayWalkAnimation();
 				foundCookie.SignalOnCookieEatenByCharacter.AddListener(OnMyCookieEaten);
 			} else {
 				Stop();
 				Debug.LogError("Can't find cookies :(");
 			}
+
+			return foundCookie;
+		}
+
+
+		public void FindNewTarget() {
+			if (_targetCookie != null) {
+				if (_targetCookie.SignalOnCookieEatenByCharacter != null) {
+					_targetCookie.SignalOnCookieEatenByCharacter.RemoveListener(OnMyCookieEaten);
+				}
+			}
+
+			/*
+			var nearestCharacterView = FindNearestCharacter();
+			var nearestCharacter = CharactersContainer.Instance.GetCharacter(nearestCharacterView.ID);
+			var meCharacterView = CharactersContainer.Instance.GetCharacterView(ID);
+			var meCharacter = CharactersContainer.Instance.GetCharacter(ID);
+
+			if (nearestCharacterView != null && nearestCharacter != null &&
+			    meCharacterView != null && meCharacter != null) {
+				var distance = Vector2.Distance(nearestCharacterView.transform.position, transform.position);
+				if (distance < 5f) {
+
+					if (nearestCharacter.Weight < meCharacter.Weight) {
+						_targetCharacter = nearestCharacterView;
+						PlayWalkAnimation();
+					}
+				}
+			} else {
+			*/
+				_targetCookie = FindNearestCookie();
+			//}
 		}
 
 		private void OnMyCookieEaten(CookieView cookie, int enemyID) {
