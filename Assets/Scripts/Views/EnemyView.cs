@@ -1,3 +1,4 @@
+using Controllers;
 using UnityEngine;
 
 namespace gRaFFit.Agar.Views {
@@ -7,7 +8,7 @@ namespace gRaFFit.Agar.Views {
 		private CookieView _targetCookie;
 		private CharacterView _targetCharacter;
 
-		public void MoveToTarget() {
+		public override void MoveToTarget() {
 			if (_targetCookie != null && _collider2D.enabled) {
 				_rigidbody2D.velocity =
 					((Vector2) _targetCookie.transform.position - (Vector2) transform.position).normalized *
@@ -21,14 +22,16 @@ namespace gRaFFit.Agar.Views {
 
 		public void FindNewTarget() {
 			if (_targetCookie != null) {
-				if (_targetCookie.SignalOnCookieEatenByEnemy != null) {
-					_targetCookie.SignalOnCookieEatenByEnemy.RemoveListener(OnMyCookieEaten);
-				}
-
-				if (_targetCookie.SignalOnCookieEatenByPlayer != null) {
-					_targetCookie.SignalOnCookieEatenByPlayer.RemoveListener(OnMyCookieEaten);
+				if (_targetCookie.SignalOnCookieEatenByCharacter != null) {
+					_targetCookie.SignalOnCookieEatenByCharacter.RemoveListener(OnMyCookieEaten);
 				}
 			}
+
+
+			for (int i = 0; i < CharactersContainer.Instance.Characters.Count; i++) {
+				// TODO: 
+			}
+			
 
 			CookieView foundCookie = null;
 			float distanceToNearestCookie = 0;
@@ -54,16 +57,11 @@ namespace gRaFFit.Agar.Views {
 			if (foundCookie != null) {
 				_targetCookie = foundCookie;
 				PlayWalkAnimation();
-				foundCookie.SignalOnCookieEatenByEnemy.AddListener(OnMyCookieEaten);
-				foundCookie.SignalOnCookieEatenByPlayer.AddListener(OnMyCookieEaten);
+				foundCookie.SignalOnCookieEatenByCharacter.AddListener(OnMyCookieEaten);
 			} else {
 				Stop();
 				Debug.LogError("Can't find cookies :(");
 			}
-		}
-
-		private void OnMyCookieEaten(CookieView cookie) {
-			FindNewTarget();
 		}
 
 		private void OnMyCookieEaten(CookieView cookie, int enemyID) {

@@ -87,5 +87,9 @@ namespace gRaFFit.Agar.Views {
 			_rigidbody2D.angularVelocity = 0;
 			_collider2D.enabled = true;
 		}
+
+		public virtual void MoveToTarget() {
+			
+		}
 	}
 }

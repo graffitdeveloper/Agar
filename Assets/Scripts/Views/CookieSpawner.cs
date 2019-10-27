@@ -42,7 +42,6 @@ namespace gRaFFit.Agar.Views {
 		
 		
 		private List<CookieView> _currentCookiesInstances;
-		public Signal<float> SignalOnCookieEatenByPlayer = new Signal<float>();
 		public Signal<float, int> SignalOnCookieEatenByEnemy = new Signal<float, int>();
 
 		public List<CookieView> Cookies => _currentCookiesInstances;
@@ -74,8 +73,7 @@ namespace gRaFFit.Agar.Views {
 				if (newCookie != null) {
 					newCookie.transform.position = GetRandomPositionInLevel();
 					newCookie.SetScale(Random.Range(_minCookieScale, _maxCookieScale));
-					newCookie.SignalOnCookieEatenByPlayer.AddListener(OnCookieEatenByPlayer);
-					newCookie.SignalOnCookieEatenByEnemy.AddListener(OnCookieEatenByEnemy);
+					newCookie.SignalOnCookieEatenByCharacter.AddListener(OnCookieEatenByEnemy);
 					_currentCookiesInstances.Add(newCookie);
 				} else {
 					Debug.LogError("ERROR SPAWNING COOKIE");
@@ -88,8 +86,7 @@ namespace gRaFFit.Agar.Views {
 			if (newCookie != null) {
 				newCookie.transform.position = targetPosition;
 				newCookie.SetScale(Random.Range(_minCookieScale, _maxCookieScale));
-				newCookie.SignalOnCookieEatenByPlayer.AddListener(OnCookieEatenByPlayer);
-				newCookie.SignalOnCookieEatenByEnemy.AddListener(OnCookieEatenByEnemy);
+				newCookie.SignalOnCookieEatenByCharacter.AddListener(OnCookieEatenByEnemy);
 				_currentCookiesInstances.Add(newCookie);
 				newCookie.Punch();
 			} else {
@@ -103,14 +100,6 @@ namespace gRaFFit.Agar.Views {
 			var scale = cookieView.CookieScale;
 			cookieView.Dispose();
 			SignalOnCookieEatenByEnemy.Dispatch(scale, enemyID);
-		}
-
-		private void OnCookieEatenByPlayer(CookieView cookieView) {
-			_currentCookiesInstances.Remove(cookieView);
-
-			var scale = cookieView.CookieScale;
-			cookieView.Dispose();
-			SignalOnCookieEatenByPlayer.Dispatch(scale);
 		}
 
 		public void Clear() {
