@@ -1,4 +1,5 @@
 using Controllers;
+using gRaFFit.Agar.Models.Timers;
 using Models;
 using UnityEngine;
 
@@ -119,6 +120,7 @@ namespace gRaFFit.Agar.Views {
 			}
 		}
 
+		private Timer _recheckEnemyTimer;
 
 		public void FindNewTarget() {
 			if (_targetCookie != null) {
@@ -138,7 +140,21 @@ namespace gRaFFit.Agar.Views {
 
 			if (!FindNearestCharacter()) {
 				FindNearestCookie();
+			} else {
+				if (_recheckEnemyTimer != null) {
+					_recheckEnemyTimer.Stop();
+				}
+
+				_recheckEnemyTimer = TimerManager.Instance.SetTimeout(1f, FindNewTarget);
 			}
+		}
+
+		public override void Dispose() {
+			if (_recheckEnemyTimer != null) {
+				_recheckEnemyTimer.Stop();
+			}
+
+			base.Dispose();
 		}
 
 		private void OnMyCookieEaten(CookieView cookie, int enemyID) {
