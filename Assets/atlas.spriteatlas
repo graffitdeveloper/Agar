@@ -46,14 +46,13 @@ SpriteAtlas:
     bindAsDefault: 1
     storedHash:
       serializedVersion: 2
-      Hash: 00000000000000000000000000000000
+      Hash: 0a958206c436bf45787e7bc0b3892fdb
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
   - {fileID: 21300000, guid: 6d5006b1f06250e4bb803aa7c2342c78, type: 3}
   - {fileID: 21300000, guid: 91a73733b7761854f982119a76b24ea3, type: 3}
   - {fileID: 21300000, guid: 7582154372dcdcc4ebd9fbd4a78aceb9, type: 3}
   - {fileID: 21300000, guid: 3954d854f4fbea846aa46efcb212316a, type: 3}
-  - {fileID: 21300000, guid: 5c7fe8743896d3c499053ecfe36cde8d, type: 3}
   - {fileID: 21300000, guid: da512084d61390341af1e27eb1cb2e74, type: 3}
   - {fileID: 21300000, guid: 02ce2225ef1535f4c9e0969f6030a22f, type: 3}
   - {fileID: 21300000, guid: 4b968895b93c4934484494ed3bfbbf70, type: 3}
@@ -69,7 +68,6 @@ SpriteAtlas:
   - cookie
   - Cat_yeah
   - the cat2x
-  - grasssssn
   - Cat_sleeping
   - Paw
   - the cat
