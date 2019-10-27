@@ -13,8 +13,8 @@ namespace Models {
 
 		public void EatCookie(float eatenCookieScale) {
 			Weight += eatenCookieScale;
-			if (Weight > 400) {
-				Weight = 400;
+			if (Weight > 450) {
+				Weight = 450;
 			}
 		}
 
