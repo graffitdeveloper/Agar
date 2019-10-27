@@ -92,7 +92,7 @@ namespace gRaFFit.Agar.Views {
 			_timer = TimerManager.Instance.SetTimeout(1f, EnableCollider);
 		}
 
-		protected virtual void EnableCollider() {
+		public virtual void EnableCollider() {
 			IsStunned = false;
 			Stop(!InputController.Instance.IsTouch());
 			_collider2D.enabled = true;

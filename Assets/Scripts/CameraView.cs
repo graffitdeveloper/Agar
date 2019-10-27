@@ -1,6 +1,8 @@
-﻿using gRaFFit.Agar.Controllers.InputSystem;
+﻿using System;
+using gRaFFit.Agar.Controllers.InputSystem;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using Random = UnityEngine.Random;
 
 namespace gRaFFit.Agar.Views.CameraControls {
     /// <summary>
@@ -21,6 +23,9 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
             _cachedCameraZPosition = transform.position.z;
 
+            _startCameraOrtho = _camera.orthographicSize;
+            _startCameraPos = _camera.transform.position;
+            
             Instance = this;
         }
 
@@ -30,6 +35,9 @@ namespace gRaFFit.Agar.Views.CameraControls {
 
 #pragma warning disable 649
 
+        private float _startCameraOrtho;
+        private Vector3 _startCameraPos;
+        
         [SerializeField] private float _cameraSpeed;
         [SerializeField] private float _cameraOffsetMultiplier;
         [SerializeField] private Camera _camera;
@@ -43,6 +51,11 @@ namespace gRaFFit.Agar.Views.CameraControls {
         private float _cachedCameraZPosition;
 
         private float _targetOrtho;
+
+        public void ResetCamera() {
+            transform.position = _startCameraPos;
+            _camera.orthographicSize = _targetOrtho = _startCameraOrtho;
+        }
 
         public void Update() {
             if (_player == null) return;

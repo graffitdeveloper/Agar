@@ -41,7 +41,9 @@ namespace Controllers {
 		public void Clear() {
 			_characters.Clear();
 			for (int i = 0; i < _characterViews.Count; i++) {
-				_characterViews[i].Dispose();
+				if (_characterViews[i] is EnemyView) {
+					_characterViews[i].Dispose();
+				}
 			}
 
 			_characterViews.Clear();

@@ -34,7 +34,8 @@ namespace Controllers {
 			CookieSpawner.Instance.InstantiateAllCookies();
 			
 			InitPlayer();
-			
+			CameraView.Instance.ResetCamera();
+
 			for (int i = 0; i < _targetCharactersCount; i++) {
 				var enemyModel = new Character();
 
@@ -113,7 +114,10 @@ namespace Controllers {
 			CharactersContainer.Instance.Clear();
 			CookieSpawner.Instance.Clear();
 			UIManager.Instance.HidePanel<HudPanelView>();
-
+			_playerView.EnableCollider();
+			_playerView.Stop();
+			_playerView.gameObject.SetActive(false);
+			
 			base.Deactivate();
 		}
 

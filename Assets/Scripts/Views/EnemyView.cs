@@ -137,7 +137,7 @@ namespace gRaFFit.Agar.Views {
 			FindNewTarget();
 		}
 		
-		protected override void EnableCollider() {
+		public override void EnableCollider() {
 			FindNewTarget();
 			
 			base.EnableCollider();
