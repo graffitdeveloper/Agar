@@ -21,10 +21,6 @@ namespace Controllers {
 
 		private Character _player;
 
-		private List<Character> _enemies;
-
-		private List<EnemyView> _enemyViews;
-
 		private const string ENEMY_POOL_KEY = "ENEMY_POOL_KEY";
 
 		public override void Activate() {
@@ -42,22 +38,19 @@ namespace Controllers {
 			CameraView.Instance.SetToPlayer(_playerView);
 			CookieSpawner.Instance.Init();
 			CookieSpawner.Instance.InstantiateAllCookies();
-			
-			_enemies = new List<Character>();
-			_enemyViews = new List<EnemyView>();
 
 			for (int i = 0; i < _targetCharactersCount; i++) {
 				var enemyModel = new Character();
-				_enemies.Add(enemyModel);
 
 				var newEnemy = PoolService.Instance.PopObject(ENEMY_POOL_KEY) as EnemyView;
 				if (newEnemy != null) {
-					_enemyViews.Add(newEnemy);
 					newEnemy.Init(enemyModel.ID);
 					newEnemy.transform.position = CookieSpawner.Instance.GetRandomPositionInLevel();
 					newEnemy.FindNewTarget();
 					newEnemy.SignalOnCharactersCollided.AddListener(OnCharactersCollided);
 				}
+
+				EnemiesContainer.Instance.PutEnemy(enemyModel, newEnemy);
 			}
 
 			AddListeners();
@@ -65,12 +58,13 @@ namespace Controllers {
 
 
 		private void OnCharactersCollided(CharacterView firstView, CharacterView secondView) {
-			var first = _enemies.Find(enemy => enemy.ID == firstView.ID);
+
+			var first = EnemiesContainer.Instance.GetEnemy(firstView.ID);
 			if (first == null && _player.ID == firstView.ID) {
 				first = _player;
 			}
 
-			var second = _enemies.Find(enemy => enemy.ID == secondView.ID);
+			var second = EnemiesContainer.Instance.GetEnemy(secondView.ID);
 			if (second == null && _player.ID == secondView.ID) {
 				second = _player;
 			}
@@ -109,17 +103,10 @@ namespace Controllers {
 			_playerView.gameObject.SetActive(false);
 			_bgMeshRenderer.gameObject.SetActive(false);
 
-			for (int i = 0; i < _enemyViews.Count; i++) {
-				_enemyViews[i].Dispose();
-			}
-
-			_enemyViews.Clear();
-			_enemyViews = null;
+			EnemiesContainer.Instance.Clear();
 
 			CookieSpawner.Instance.Clear();
 			_player = null;
-			_enemies.Clear();
-			_enemies = null;
 
 			UIManager.Instance.HidePanel<HudPanelView>();
 
@@ -133,8 +120,8 @@ namespace Controllers {
 		}
 
 		private void RefreshEnemyWeight(int id) {
-			var enemyModel = _enemies.Find(enemy => enemy.ID == id);
-			var enemyView = _enemyViews.Find(enemy => enemy.ID == id);
+			var enemyModel = EnemiesContainer.Instance.GetEnemy(id);
+			var enemyView = EnemiesContainer.Instance.GetEnemyView(id);
 			if (enemyView != null) {
 				enemyView.SetWeight(enemyModel.Weight);
 			}
@@ -189,7 +176,7 @@ namespace Controllers {
 		}
 
 		private void OnCookieEatenByEnemy(float cookieWeight, int enemyID) {
-			var targetEnemy = _enemies.Find(enemy => enemy.ID == enemyID);
+			var targetEnemy = EnemiesContainer.Instance.GetEnemy(enemyID);
 			if (targetEnemy != null) {
 				targetEnemy.EatCookie(cookieWeight);
 				RefreshEnemyWeight(enemyID);
@@ -219,9 +206,9 @@ namespace Controllers {
 		}
 
 		private void Update() {
-			if (_enemyViews != null) {
-				for (int i = 0; i < _enemyViews.Count; i++) {
-					_enemyViews[i].MoveToTarget();
+			if (EnemiesContainer.Instance.EnemyViews != null) {
+				for (int i = 0; i < EnemiesContainer.Instance.EnemyViews.Count; i++) {
+					EnemiesContainer.Instance.EnemyViews[i].MoveToTarget();
 				}
 			}
 

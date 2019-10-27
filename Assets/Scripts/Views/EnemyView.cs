@@ -4,51 +4,55 @@ namespace gRaFFit.Agar.Views {
 
 	public class EnemyView : CharacterView {
 
-		private CookieView _currentCookie;
+		private CookieView _targetCookie;
+		private CharacterView _targetCharacter;
 
 		public void MoveToTarget() {
-			if (_currentCookie != null && _collider2D.enabled) {
+			if (_targetCookie != null && _collider2D.enabled) {
 				_rigidbody2D.velocity =
-					((Vector2) _currentCookie.transform.position - (Vector2) transform.position).normalized *
+					((Vector2) _targetCookie.transform.position - (Vector2) transform.position).normalized *
 					_moveSpeed;
 
-				FaceToPosition(_currentCookie.transform.position);
+				FaceToPosition(_targetCookie.transform.position);
 			} else {
 				_rigidbody2D.velocity = Vector3.Lerp(_rigidbody2D.velocity, Vector3.zero, 1f * Time.deltaTime);
 			}
 		}
 
 		public void FindNewTarget() {
-			if (_currentCookie != null) {
-				if (_currentCookie.SignalOnCookieEatenByEnemy != null) {
-					_currentCookie.SignalOnCookieEatenByEnemy.RemoveListener(OnMyCookieEaten);
+			if (_targetCookie != null) {
+				if (_targetCookie.SignalOnCookieEatenByEnemy != null) {
+					_targetCookie.SignalOnCookieEatenByEnemy.RemoveListener(OnMyCookieEaten);
 				}
 
-				if (_currentCookie.SignalOnCookieEatenByPlayer != null) {
-					_currentCookie.SignalOnCookieEatenByPlayer.RemoveListener(OnMyCookieEaten);
+				if (_targetCookie.SignalOnCookieEatenByPlayer != null) {
+					_targetCookie.SignalOnCookieEatenByPlayer.RemoveListener(OnMyCookieEaten);
 				}
 			}
 
 			CookieView foundCookie = null;
 			float distanceToNearestCookie = 0;
 
-			for (int i = 0; i < CookieSpawner.Instance.Cookies.Count; i++) {
-				var currentCookie = CookieSpawner.Instance.Cookies[i];
-				if (foundCookie == null) {
-					foundCookie = currentCookie;
-					distanceToNearestCookie = Vector2.Distance(currentCookie.transform.position, transform.position);
-				} else {
-					var distanceToCurrentCookie =
-						Vector2.Distance(currentCookie.transform.position, transform.position);
-					if (distanceToCurrentCookie < distanceToNearestCookie) {
-						distanceToNearestCookie = distanceToCurrentCookie;
+			if (CookieSpawner.Instance.Cookies != null) {
+				for (int i = 0; i < CookieSpawner.Instance.Cookies.Count; i++) {
+					var currentCookie = CookieSpawner.Instance.Cookies[i];
+					if (foundCookie == null) {
 						foundCookie = currentCookie;
+						distanceToNearestCookie =
+							Vector2.Distance(currentCookie.transform.position, transform.position);
+					} else {
+						var distanceToCurrentCookie =
+							Vector2.Distance(currentCookie.transform.position, transform.position);
+						if (distanceToCurrentCookie < distanceToNearestCookie) {
+							distanceToNearestCookie = distanceToCurrentCookie;
+							foundCookie = currentCookie;
+						}
 					}
 				}
 			}
 
 			if (foundCookie != null) {
-				_currentCookie = foundCookie;
+				_targetCookie = foundCookie;
 				PlayWalkAnimation();
 				foundCookie.SignalOnCookieEatenByEnemy.AddListener(OnMyCookieEaten);
 				foundCookie.SignalOnCookieEatenByPlayer.AddListener(OnMyCookieEaten);
