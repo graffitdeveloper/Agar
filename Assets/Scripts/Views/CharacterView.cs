@@ -1,3 +1,4 @@
+using gRaFFit.Agar.Controllers.InputSystem;
 using gRaFFit.Agar.Models.Timers;
 using gRaFFit.Agar.Utils;
 using gRaFFit.Agar.Utils.Signals;
@@ -42,13 +43,17 @@ namespace gRaFFit.Agar.Views {
 			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_WALK);
 		}
 
-		public void Stop() {
-			transform.rotation = Quaternion.identity;
-			_spriteRenderer.flipY = false;
-			_rigidbody2D.velocity = Vector2.zero;
-			_rigidbody2D.angularVelocity = 0;
+		public void Stop(bool playStopAnimation = true) {
+			if (!IsStunned) {
+				transform.rotation = Quaternion.identity;
+				_spriteRenderer.flipY = false;
+				_rigidbody2D.velocity = Vector2.zero;
+				_rigidbody2D.angularVelocity = 0;
 
-			AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_SIT);
+				if (playStopAnimation) {
+					AnimatorHelper.Instance.PlayAnimation(_animator, ANIMATION_STATE_SIT);
+				}
+			}
 		}
 
 
@@ -89,8 +94,7 @@ namespace gRaFFit.Agar.Views {
 
 		protected virtual void EnableCollider() {
 			IsStunned = false;
-			
-			_rigidbody2D.angularVelocity = 0;
+			Stop(!InputController.Instance.IsTouch());
 			_collider2D.enabled = true;
 		}
 
